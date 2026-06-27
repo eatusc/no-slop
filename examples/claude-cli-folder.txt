@@ -1,0 +1,23 @@
+Claude Code is not just a coding tool.
+
+The underrated move is pointing it at a normal folder.
+
+Receipts, PDFs, CSVs, screenshots, exports, notes, screen recordings — the messy local files you usually upload one at a time.
+
+The CLI can read the folder, write scripts, run tools like FFmpeg, clean data, build charts, and save the output back where it belongs.
+
+Add a CLAUDE.md file and the folder gets memory: rules, context, preferences, and repeatable instructions.
+
+Run it headless with claude -p, schedule it, and wake up to the result already sitting in the folder.
+
+Same mental model works with Codex.
+
+Stop asking:
+"Is this a coding task?"
+
+Ask:
+"Can this be done on a computer?"
+
+DM "FOLDER" for the starter setup.
+
+#ClaudeCode #Codex #AIWorkflow #Productivity #LocalFiles

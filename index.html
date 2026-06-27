@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>No Slop</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧹</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">No&nbsp;Slop</span>
+      <span class="tag">paste AI text, get the human version</span>
+    </div>
+    <span class="spacer"></span>
+    <nav class="tabs">
+      <button class="tab active" data-tab="deslop">De-slop</button>
+      <button class="tab" data-tab="examples">Examples</button>
+      <button class="tab" data-tab="rules">Rules</button>
+      <button class="tab" data-tab="voice">Voice</button>
+      <button class="tab" data-tab="api">API</button>
+    </nav>
+    <span class="port">localhost:4242</span>
+  </header>
+
+  <!-- ===================== DE-SLOP ===================== -->
+  <div class="view active" id="view-deslop">
+    <div class="slopometer">
+      <span class="slop-label">Slopometer</span>
+      <div class="slop-track">
+        <div class="slop-fill" id="slop-fill"></div>
+        <div class="slop-needle" id="slop-needle"></div>
+      </div>
+      <span class="slop-readout" id="slop-readout">—</span>
+    </div>
+
+    <main>
+      <section class="pane">
+        <div class="pane-head">
+          <h2>Paste slop</h2>
+          <button class="lnk" id="sample">Try a sample</button>
+          <span class="spacer"></span>
+          <span class="count" id="in-count">0 words</span>
+          <button class="lnk" id="clear">Clear</button>
+        </div>
+        <textarea id="input" placeholder="Paste the AI-generated text here…"></textarea>
+      </section>
+
+      <div class="middle">
+        <button class="go" id="go">De-slop&nbsp;→</button>
+        <label class="live"><input type="checkbox" id="liveToggle" checked /> Live</label>
+      </div>
+
+      <section class="pane">
+        <div class="pane-head">
+          <h2>No slop</h2>
+          <label class="live"><input type="checkbox" id="hlToggle" checked /> Highlights</label>
+          <span class="spacer"></span>
+          <span class="count" id="out-count">0 words</span>
+          <button class="lnk" id="copy">Copy</button>
+        </div>
+        <div id="output" class="output"><span class="muted">The cleaned-up version shows up here…</span></div>
+      </section>
+    </main>
+
+    <footer id="stats">
+      <span class="muted">Nothing cleaned yet. Paste something on the left.</span>
+    </footer>
+  </div>
+
+  <!-- ===================== EXAMPLES ===================== -->
+  <div class="view" id="view-examples">
+    <div class="ex-wrap">
+      <aside class="ex-list" id="ex-list">
+        <div class="ex-loading muted">Loading examples…</div>
+      </aside>
+      <section class="ex-detail">
+        <div class="ex-detail-head">
+          <h2 id="ex-title">Select a caption</h2>
+          <span class="spacer"></span>
+          <span class="ex-score" id="ex-score"></span>
+          <button class="lnk" id="ex-load">De-slop this →</button>
+        </div>
+        <pre class="ex-body" id="ex-body"><span class="muted">Pick a caption on the left to read it. These are the real HAP captions pulled from /[redacted] — the test set for No Slop.</span></pre>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== RULES ===================== -->
+  <div class="view" id="view-rules">
+    <div class="doc-wrap">
+      <div class="doc-head">
+        <h2>no-slop-rules.md</h2>
+        <span class="muted small">what to strip · edits save straight to the file on disk</span>
+        <span class="spacer"></span>
+        <button class="lnk" id="rules-reload">Reload</button>
+        <button class="go small" id="rules-save">Save</button>
+        <span class="toast" id="rules-saved">Saved</span>
+      </div>
+      <textarea class="doc-text" id="rules-text" spellcheck="false" placeholder="Loading no-slop-rules.md…"></textarea>
+    </div>
+  </div>
+
+  <!-- ===================== VOICE ===================== -->
+  <div class="view" id="view-voice">
+    <div class="doc-wrap">
+      <div class="doc-head">
+        <h2>voice.md</h2>
+        <span class="muted small">what to emulate · edits save straight to the file on disk</span>
+        <span class="spacer"></span>
+        <button class="lnk" id="voice-reload">Reload</button>
+        <button class="go small" id="voice-save">Save</button>
+        <span class="toast" id="voice-saved">Saved</span>
+      </div>
+      <textarea class="doc-text" id="voice-text" spellcheck="false" placeholder="Loading voice.md…"></textarea>
+    </div>
+  </div>
+
+  <!-- ===================== API ===================== -->
+  <div class="view" id="view-api">
+    <div class="doc-wrap">
+      <div class="doc-head">
+        <h2>API.md</h2>
+        <span class="muted small">POST text to localhost:4242/api/deslop · or use the CLI</span>
+        <span class="spacer"></span>
+        <button class="lnk" id="api-reload">Reload</button>
+        <button class="go small" id="api-save">Save</button>
+        <span class="toast" id="api-saved">Saved</span>
+      </div>
+      <textarea class="doc-text" id="api-text" spellcheck="false" placeholder="Loading API.md…"></textarea>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

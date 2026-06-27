@@ -1,0 +1,23 @@
+AI tip: treat your prompts like code.
+
+People who are good at AI are not starting from scratch every time.
+
+They save what worked.
+They turn it into a reusable template.
+They version it after strong runs.
+They turn repeated workflows into skills.
+
+The move:
+
+1. Make one home for your best prompts.
+2. Structure each one like a function: goal, role, constraints, steps, output format, examples.
+3. Bump the version when you improve it.
+4. Turn repeat workflows into reusable skills.
+
+Everyone else reinvents the wheel in every new chat.
+
+You build on your best version.
+
+That gap compounds.
+
+#AITips #PromptEngineering #Codex #Claude #Automation #HelpAProduct

@@ -1,0 +1,25 @@
+Hermes and OpenClaw look incredible. Most people still don't need them.
+
+They are also not what most people need.
+
+The pitch sounds incredible:
+
+- always-on agent
+- texts you first
+- remembers everything
+- manages your inbox
+- runs local models
+
+But most actual use cases are still email cleanup, reminders, lead lists, summaries, and basic workflow help.
+
+ChatGPT and Claude already do most of that without turning your weekend into a command-line debugging session.
+
+If you really need an always-on local agent today, eat the setup pain.
+
+If you do not, wait.
+
+The big models will absorb a lot of this natively.
+
+Sometimes the best AI purchase is no purchase.
+
+#AI #AIAgents #OpenSourceAI #BusinessAutomation #AIConsulting

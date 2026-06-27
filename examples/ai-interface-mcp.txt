@@ -1,0 +1,47 @@
+Websites now have two audiences: humans and AI agents.
+
+The bridge is an MCP server.
+
+MCP stands for Model Context Protocol. It gives AI clients a standard way to discover what your product can do, then call real actions through your app.
+
+The rough setup:
+
+1. Pick the actions an agent should be allowed to take.
+Examples: search inventory, create a booking, update a CRM record, fetch account data, generate a report.
+
+2. Wrap each action as an MCP tool.
+Each tool needs a clear name, description, input schema, and output shape.
+
+3. Run a small MCP server.
+For local/internal workflows, this can use stdio. For production and user-facing agents, think remote HTTPS, auth, scoped permissions, audit logs, rate limits, and safe retries.
+
+4. Let the client discover tools.
+The model does not magically know your app. The client asks the server what tools exist, then calls the right one when the user asks for something.
+
+5. Test it like a product surface.
+Bad tool descriptions, messy schemas, missing permissions, or unclear errors become bad agent UX.
+
+Where to look:
+
+MCP intro:
+https://modelcontextprotocol.io/docs/getting-started/intro
+
+Build a server:
+https://modelcontextprotocol.io/docs/develop/build-server
+
+Tools spec:
+https://modelcontextprotocol.io/specification/2025-11-25/server/tools
+
+Inspector for testing:
+https://modelcontextprotocol.io/docs/tools/inspector
+
+OpenAI MCP server docs:
+https://developers.openai.com/apps-sdk/build/mcp-server
+
+The product question is no longer just:
+"Can we build it?"
+
+It is:
+"Can an agent use it safely?"
+
+#AI #AIAgents #MCP #ProductStrategy #AIAutomation

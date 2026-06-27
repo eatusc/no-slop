@@ -1,0 +1,30 @@
+No more apps or websites?
+
+Maybe not literally.
+
+But the interface is changing fast.
+
+People are already going straight to chatbots instead of digging through websites.
+
+And the plumbing is here now.
+
+MCP lets AI connect to an app's real data and actions.
+Anthropic shipped it in 2024.
+OpenAI and Google followed.
+
+That flips the product question.
+
+The app becomes the backend.
+The AI becomes the interface.
+
+For builders, the question is no longer just:
+
+"What's our app?"
+
+It's:
+
+"What can the AI call?"
+
+Be the capability, not the destination.
+
+#MCP #AIAgents #ProductStrategy #SaaS #AIAutomation
