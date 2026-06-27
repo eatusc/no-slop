@@ -44,8 +44,10 @@ function json(res, code, obj) {
   res.end(JSON.stringify(obj))
 }
 
-// Small local API so the app can read the example captions and read/write the
-// no-slop-rules.md file from the browser. Runs inside Vite's dev/preview server.
+// Local API served inside Vite's dev/preview server:
+//   POST /api/deslop      de-slop text (raw or JSON) -> report, or ?clean=1 plain text
+//   GET  /api/examples    the caption corpus
+//   GET/POST /api/doc/<name>   read/write an editable markdown doc (rules|voice|api)
 function noslopApi() {
   const handler = async (req, res, next) => {
     const url = new URL(req.url, 'http://localhost')

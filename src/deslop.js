@@ -1,12 +1,21 @@
 // ---------------------------------------------------------------------------
-// No Slop — de-slop engine
+// No Slop — de-slop engine (single source of truth for the app, API, and CLI)
 // ---------------------------------------------------------------------------
 // Takes AI-generated text and strips the tells: em-dash overload, curly quotes,
 // emoji, hype words, filler openers and empty transition phrases. Pure string
-// work, runs entirely in the browser. No API, no key, instant.
+// work with no dependencies — runs anywhere (browser, Node API, CLI). Instant.
 //
-// deslop(text) -> { text, groups: [{ label, count }], total }
+// Exports:
+//   deslop(text)    -> { text, groups: [{ label, count }], total }
+//   flagsFor(text)  -> [{ type, label, fix, count, samples }]   (rewrite by hand)
+//   slopScore(text) -> { score, label, color, signals, per100, words }
 // ---------------------------------------------------------------------------
+
+// Count non-overlapping matches of a global regex.
+function countMatches(text, re) {
+  const m = text.match(re);
+  return m ? m.length : 0;
+}
 
 // Re-capitalize a replacement to match the casing of the text it replaced,
 // so swapping "Leverage" -> "Use" keeps the capital.
@@ -135,11 +144,6 @@ const OPENERS = [
 const TRANSITIONS = [
   /(^|[.!?]\s+|\n)(Furthermore|Moreover|Additionally|Notably|Importantly|Indeed|Essentially|Ultimately|Consequently|Subsequently),?\s+/g,
 ];
-
-function countMatches(text, re) {
-  const m = text.match(re);
-  return m ? m.length : 0;
-}
 
 export function deslop(input) {
   let text = input;
@@ -304,11 +308,6 @@ const WEIGHTS = {
   ruleOfThree: 2.5,
 };
 
-function count(text, re) {
-  const m = text.match(re);
-  return m ? m.length : 0;
-}
-
 export function slopScore(input) {
   const text = input || '';
   const words = Math.max(1, (text.trim().match(/\S+/g) || []).length);
@@ -325,9 +324,9 @@ export function slopScore(input) {
     transitions: g('Throat-clearing transitions'),
     hype: g('Empty hype phrases'),
     words: g('Inflated words'),
-    hedges: count(text, HEDGES),
-    vague: count(text, VAGUE),
-    ruleOfThree: count(text, RULE_OF_THREE),
+    hedges: countMatches(text, HEDGES),
+    vague: countMatches(text, VAGUE),
+    ruleOfThree: countMatches(text, RULE_OF_THREE),
   };
 
   let points = 0;
