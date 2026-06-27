@@ -5,3 +5,6 @@ dist
 
 # third-party essays (copyright) — regenerate locally with examples/lyn-alden/fetch-lyn.sh
 examples/lyn-alden/*.txt
+
+# personal learned voice examples (grows as you "Add to my voice"); seed.jsonl is committed
+style/examples.jsonl

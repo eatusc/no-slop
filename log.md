@@ -153,6 +153,32 @@ A running log of the app and the caption-conversion work.
 
 ---
 
+## 2026-06-27 — AI Rewrite tab + learning loop (the real de-slop)
+
+The regex engine only does surface cleanup. Added a true **rewrite** that restructures,
+distills, and writes in Eric's voice — driven by an LLM via his local CLI (no API key).
+
+- **Engine:** shells to the `claude` CLI (`claude -p --append-system-prompt --model
+  claude-opus-4-8 --output-format text`), or `codex exec`. Uses existing login. Binary
+  paths resolved (`~/.local/bin/claude`, `/opt/homebrew/bin/codex`) so it works under the
+  dashboard's env. `/api/rewrite` in `vite.config.js`.
+- **Prompt:** system = a distilled "tells to avoid" list (NOT the rules' word-swap table,
+  which caused literal swapping) + full `voice.md` + the style-bank examples as
+  BEFORE→AFTER few-shot. Heavy-rewrite mandate + hard constraints (keep numbers, names,
+  links exactly; output only the rewrite).
+- **Spec (from clarifying Qs):** full rewrite · distill to essentials · my voice · may add
+  a real take · Opus 4.8 · separate Rewrite tab (instant De-slop stays) · one output +
+  Regenerate · editable output.
+- **Learning loop:** "Add to my voice" saves the input → my-edited-output pair to
+  `style/examples.jsonl` (gitignored); future rewrites read it as few-shot. Seeded with
+  the before/after Eric gave (`style/seed.jsonl`, committed). `/api/style` GET/POST.
+- **UI:** Rewrite tab (engine select, Rewrite, Regenerate, voice count); Examples tab got
+  a "Rewrite this ✦" button. Cmd+Enter rewrites.
+- Verified: SpaceX caption rewrote from a long structured post into punchy distilled lines
+  in ~10s, keeping every figure/name/hashtag and adding a take.
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.

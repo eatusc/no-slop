@@ -16,6 +16,7 @@
     <span class="spacer"></span>
     <nav class="tabs">
       <button class="tab active" data-tab="deslop">De-slop</button>
+      <button class="tab" data-tab="rewrite">Rewrite</button>
       <button class="tab" data-tab="examples">Examples</button>
       <button class="tab" data-tab="rules">Rules</button>
       <button class="tab" data-tab="voice">Voice</button>
@@ -69,6 +70,56 @@
     </footer>
   </div>
 
+  <!-- ===================== REWRITE (AI) ===================== -->
+  <div class="view" id="view-rewrite">
+    <div class="rw-bar">
+      <span class="rw-title">AI Rewrite</span>
+      <span class="muted small">heavy rewrite in your voice, via your local CLI</span>
+      <span class="spacer"></span>
+      <span class="rw-voice muted small" id="rw-voice">voice: …</span>
+    </div>
+
+    <main>
+      <section class="pane">
+        <div class="pane-head">
+          <h2>Paste / load</h2>
+          <button class="lnk" id="rw-sample">Try a sample</button>
+          <span class="spacer"></span>
+          <span class="count" id="rw-in-count">0 words</span>
+          <button class="lnk" id="rw-clear">Clear</button>
+        </div>
+        <textarea id="rw-input" placeholder="Paste AI text here — or open a caption in Examples and hit 'Rewrite this'…"></textarea>
+      </section>
+
+      <div class="middle">
+        <select id="rw-engine" class="rw-select" title="Which CLI to use">
+          <option value="claude">Claude · opus 4.8</option>
+          <option value="codex">Codex</option>
+        </select>
+        <button class="go" id="rw-go">✦&nbsp;Rewrite</button>
+        <button class="lnk" id="rw-regen">↻ Regenerate</button>
+      </div>
+
+      <section class="pane">
+        <div class="pane-head">
+          <h2>Rewrite</h2>
+          <span class="muted small" id="rw-status"></span>
+          <span class="spacer"></span>
+          <span class="count" id="rw-out-count">0 words</span>
+          <button class="lnk" id="rw-copy">Copy</button>
+        </div>
+        <textarea id="rw-output" placeholder="Your rewrite shows up here. Edit it until it's perfect, then 'Add to my voice' so it learns."></textarea>
+      </section>
+    </main>
+
+    <footer id="rw-foot">
+      <button class="go small" id="rw-save">＋ Add to my voice</button>
+      <span class="muted small" id="rw-slop"></span>
+      <span class="spacer"></span>
+      <span class="toast" id="rw-saved">Saved to your voice ✓</span>
+    </footer>
+  </div>
+
   <!-- ===================== EXAMPLES ===================== -->
   <div class="view" id="view-examples">
     <div class="ex-wrap">
@@ -80,6 +131,7 @@
           <h2 id="ex-title">Select a caption</h2>
           <span class="spacer"></span>
           <span class="ex-score" id="ex-score"></span>
+          <button class="lnk" id="ex-rewrite">Rewrite this ✦</button>
           <button class="lnk" id="ex-load">De-slop this →</button>
         </div>
         <pre class="ex-body" id="ex-body"><span class="muted">Pick a caption on the left to read it. These are the real HAP captions pulled from /slideshows — the test set for No Slop.</span></pre>
