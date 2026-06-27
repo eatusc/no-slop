@@ -75,7 +75,7 @@ function run() {
     '<span class="legend"><mark>swapped</mark> <del>removed</del></span>'
   stats.innerHTML =
     `<span class="chip total"><b>${total}</b> fixes</span>` + chips + flagChips +
-    '<span class="spacer" style="flex:1"></span>' + legend +
+    '<span class="spacer"></span>' + legend +
     '<span class="toast" id="toast">Copied ✓</span>'
 }
 
@@ -115,16 +115,6 @@ $('clear').addEventListener('click', () => {
 $('sample').addEventListener('click', () => {
   input.value = SAMPLE
   run()
-})
-
-// Cmd/Ctrl+Enter runs even when Live is off.
-document.addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-    if (views.rules.classList.contains('active')) rulesDoc.save()
-    else if (views.voice.classList.contains('active')) voiceDoc.save()
-    else if (views.api.classList.contains('active')) apiDoc.save()
-    else run()
-  }
 })
 
 // ---------------------------------------------------------------------------
@@ -174,21 +164,22 @@ async function loadExamples() {
     return
   }
   examplesLoaded = true
-  exList.innerHTML = ''
-  exItems
+  // score once, here, and keep it on each item (sorted worst-slop-first)
+  exItems = exItems
     .map((it) => ({ ...it, sc: slopScore(it.text) }))
     .sort((a, b) => b.sc.score - a.sc.score)
-    .forEach((it) => {
-      const el = document.createElement('div')
-      el.className = 'ex-item'
-      el.dataset.file = it.file
-      el.innerHTML =
-        `<span class="ex-dot" style="background:${it.sc.color}"></span>` +
-        `<span class="slug">${it.slug}</span>` +
-        `<span class="stage">${it.stage || ''}</span>`
-      el.addEventListener('click', () => showExample(it.file))
-      exList.appendChild(el)
-    })
+  exList.innerHTML = ''
+  for (const it of exItems) {
+    const el = document.createElement('div')
+    el.className = 'ex-item'
+    el.dataset.file = it.file
+    el.innerHTML =
+      `<span class="ex-dot" style="background:${it.sc.color}"></span>` +
+      `<span class="slug">${it.slug}</span>` +
+      `<span class="stage">${it.stage || ''}</span>`
+    el.addEventListener('click', () => showExample(it.file))
+    exList.appendChild(el)
+  }
 }
 
 function showExample(file) {
@@ -196,9 +187,9 @@ function showExample(file) {
   if (!it) return
   exCurrent = it
   ;[...exList.children].forEach((c) => c.classList.toggle('active', c.dataset.file === file))
-  const sc = slopScore(it.text)
+  const words = it.words || (it.text.trim().match(/\S+/g) || []).length
   exTitle.textContent = it.slug
-  exScore.innerHTML = `slop <b style="color:${sc.color}">${sc.score}</b> · ${it.words || it.text.trim().split(/\s+/).length} words`
+  exScore.innerHTML = `slop <b style="color:${it.sc.color}">${it.sc.score}</b> · ${words} words`
   exBody.textContent = it.text
 }
 
@@ -210,7 +201,7 @@ exLoad.addEventListener('click', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Doc editor tabs (Rules, Voice) — view + edit a markdown file on disk
+// Doc editor tabs (Rules, Voice, API) — view + edit a markdown file on disk
 // ---------------------------------------------------------------------------
 function setupDoc(name, apiPath) {
   const ta = $(name + '-text')
@@ -248,6 +239,15 @@ function setupDoc(name, apiPath) {
 const rulesDoc = setupDoc('rules', '/api/doc/rules')
 const voiceDoc = setupDoc('voice', '/api/doc/voice')
 const apiDoc = setupDoc('api', '/api/doc/api')
+
+// Cmd/Ctrl+Enter: save the active doc editor, or run the de-slopper otherwise.
+document.addEventListener('keydown', (e) => {
+  if (!((e.metaKey || e.ctrlKey) && e.key === 'Enter')) return
+  if (views.rules.classList.contains('active')) rulesDoc.save()
+  else if (views.voice.classList.contains('active')) voiceDoc.save()
+  else if (views.api.classList.contains('active')) apiDoc.save()
+  else run()
+})
 
 // open the tab named in the URL hash on load (#examples / #rules), default de-slop
 if (location.hash) switchTab(location.hash.slice(1))

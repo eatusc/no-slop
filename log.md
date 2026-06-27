@@ -128,6 +128,20 @@ A running log of the app and the caption-conversion work.
 
 ---
 
+## 2026-06-27 — Code cleanup + README integration guide
+
+- **Cleanup pass** (behavior unchanged, all verified): de-duped the `count`/`countMatches`
+  helper in `deslop.js`; updated the stale "browser-only" header to note it runs
+  anywhere (app/API/CLI) and listed all exports; moved the Cmd+Enter keydown handler in
+  `main.js` below the declarations it uses (top-to-bottom read order); Examples now
+  scores each item once and reuses it (no recompute in `showExample`); dropped a
+  redundant inline `flex:1` style; refreshed stale comments in `main.js`/`vite.config.js`.
+- **README rewrite** with a "Plug it into your workflow" section: shell function +
+  pbpaste/pbcopy, LLM/agent instruction, Node, Python, macOS Quick Action/Raycast, and
+  an MCP-style tool description. Response shape and engine-as-single-source documented.
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.
