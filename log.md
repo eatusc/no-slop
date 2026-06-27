@@ -117,6 +117,17 @@ A running log of the app and the caption-conversion work.
 
 ---
 
+## 2026-06-27 — White-hat reframing of the long-form rules
+
+- Reworked the long-form section of `voice.md` from "emulate Lyn Alden" to **general
+  clear-writing craft**. Added an explicit white-hat note: her public essays were used
+  *only* to identify/measure which general techniques mark human prose — NOT to imitate
+  her voice or reuse her words. Replaced all her verbatim quotes with generic, self-
+  written illustrations. Updated the Sources section to state her text isn't
+  redistributed and to respect lynalden.com's terms. Engine/rules unchanged.
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.

@@ -85,71 +85,77 @@ adjectives. An opinion you can disagree with. Confident enough to undersell.
 
 ---
 
-## Long-form rules — derived from Lyn Alden
+## Long-form rules — clear analytical writing
 
-HAP captions are short and punchy. For **longer explanatory/analytical writing**,
-emulate Lyn Alden. The rules below are reverse-engineered from her essays in
-`examples/lyn-alden/` — measured, not guessed.
+HAP captions are short and punchy. For **longer explanatory/analytical writing**, use
+the general craft rules below.
 
-**Her measured profile** (across the two essays):
-~22 words/sentence average, but a 1-to-73-word range; ~10% of sentences are under 8
-words; ~30% of paragraphs are a single sentence; ~11 numbers per 1,000 words; first
-person ("I") and direct address ("you") throughout; ~25 rhetorical questions.
-Translation: dense explanation, broken up by short punches, questions, and white space.
+> **White-hat note.** These are *general, well-established writing principles* — vary
+> sentence length, define jargon, lead with specifics, and so on. We studied strong
+> analytical writing (including Lyn Alden's public essays) only to **identify and
+> measure** which of these techniques separate clear human writing from AI slop. The
+> goal is **not** to imitate any particular writer's voice, mimic their style, or reuse
+> their words. Do not copy or paraphrase another author's text. All examples below are
+> generic, written for this file to illustrate the principle. Write in your own voice.
 
-### The rules
+**Target profile** (measured from real analytical essays as a calibration sample, used
+as general guidance — not anyone's signature):
+~22 words/sentence average with a wide 1-to-70+ range; ~10% of sentences under 8 words;
+~30% of paragraphs a single sentence; lots of concrete numbers; first person and direct
+address; occasional rhetorical questions. Translation: dense explanation, broken up by
+short punches, questions, and white space.
+
+### The rules (with generic illustrations)
 
 1. **Open plain, even on a hard topic.** First sentence is human, not technical.
    No date-stamp throat-clear, no jargon wall. Earn the right to get technical.
-   → *"Banks work in ways that are unintuitive for a lot of people."*
+   → *"Most people find compound interest confusing, and that's fine — it is."*
 
 2. **Vary sentence length hard — long explainer, then a short landing.**
    After a 30–60 word mechanism sentence, drop a 3–7 word line that lands it.
-   → *"Banks started to fail."* · *"Because they choose to."* · *"That's the 'seed corn'."*
+   → *"So the whole thing stalls."* · *"That's the catch."*
 
-3. **Use rhetorical questions to set up the next idea**, then answer them.
-   → *"What if interest rates rise?"* · *"Do they go bankrupt? How long would it last?"*
-   One question, then you explain. Don't stack three unanswered.
+3. **Use a rhetorical question to set up the next idea**, then answer it.
+   → *"What happens when rates rise?"* One question, then you explain. Don't stack three unanswered.
 
-4. **One idea per paragraph; let paragraphs be one sentence when the point is sharp.**
-   ~30% of her paragraphs are a single line. Hit return more than feels normal.
+4. **One idea per paragraph; let a paragraph be one sentence when the point is sharp.**
+   Aim for roughly a third of paragraphs as single lines. Hit return more than feels normal.
 
 5. **Define the jargon inline, the moment you use it.** "X, or <plain word>."
-   → *"gold coins and bars are pretty fungible, or interchangeable."*
+   → *"The position is illiquid, meaning you can't sell it quickly."*
    Never make the reader hold an undefined term.
 
-6. **Make the abstract concrete with an analogy or a "imagine you…" scenario.**
-   → *"Music is like trust in this analogy."* · *"Imagine for example that you run a debt-fueled business."*
+6. **Make the abstract concrete with an analogy or an "imagine you…" scenario.**
+   → *"Imagine you run a shop that only gets paid once a year."*
 
 7. **Claim, then immediately show receipts — real numbers and dates.**
-   → *"Since I first recommended it in April 2020, it has gone from $6,900 to $126,000… bitcoin alone represents 60% of all value in the space."*
-   ~11 specifics per 1,000 words. Swap every "significant/substantial" for the figure.
+   → *"Revenue tripled, from $40K in 2023 to $120K in 2025."*
+   Swap every "significant/substantial" for the actual figure.
 
-8. **Own your track record — cite your past calls, link the other side.**
-   → *"In January 2021, I analyzed Ethereum… its creator responded… (which I shared so people could see the other side)."*
-   Honesty about what you said before beats projected confidence.
+8. **Own your track record — say what you predicted before, right or wrong.**
+   Honesty about your past calls beats projected confidence. Link the other side of the argument.
 
-9. **Start sentences with And / But / So when it reads like speech.** She does, often
-   (And ×15, But ×12). It's connective and human — not an error.
+9. **Start sentences with And / But / So when it reads like speech.** It's connective
+   and human — not an error.
 
 10. **State "why this matters" before the detail, not after.**
-    → *"…understanding the banking system is helpful for investing, because it helps you tell whether to expect inflation or disinflation."*
+    → *"This matters for your taxes, because it changes which bracket you land in."*
 
 11. **Conviction without hype. Hedge only where evidence is genuinely thin.**
-    → *"blockchains outside of bitcoin will likely continue to fail to accrue major value."*
-    A clear thesis with one honest "likely" — not reflexive "may potentially."
+    → *"This will probably keep working."* One honest "probably" — not reflexive "may potentially."
 
-12. **Close on a flat, plain line, sometimes dry-funny — never a hype summary.**
-    → *"Thanks for playing, try again next time."* · *"They're just for speculating."*
+12. **Close on a flat, plain line — never a hype summary.** A dry, specific last sentence
+    beats "In conclusion, the possibilities are endless."
 
-### Long-form structure (the arc she uses)
+### Long-form structure (a reliable arc)
 
 Plain hook → why you should care → define the terms → build the mechanism step by step
 (question → explanation → short landing, repeated) → concrete numbered examples →
 honest caveats and the other side → flat, specific close. No "In conclusion."
 
 The throughline with HAP: real specifics over adjectives, an honest opinion you can
-disagree with, and respect for the reader's time. Short caption or long essay, same voice.
+disagree with, and respect for the reader's time. Short caption or long essay, same idea
+— **your** voice, just clearer.
 
 ---
 
@@ -160,10 +166,13 @@ disagree with, and respect for the reader's time. Short caption or long essay, s
 - Did I earn the turn, or am I twisting every paragraph?
 - Would I say this out loud to one person? If no, fix the rhythm.
 
-Sources:
-- HAP captions (short form) in `examples/`: `dont-read-this-bot`, `build-it-yourself`,
-  `ai-jobs-doom-boom`, `ai-interface-mcp`, `thrivepact-case-study`, `ai-codes-shortcuts`,
-  `start-here`.
-- Lyn Alden (long form) in `examples/lyn-alden/` — pulled from lynalden.com.
-  Refresh or add more with `examples/lyn-alden/fetch-lyn.sh <slug>`.
+Sources & ethics:
+- **Short-form models:** HAP's own captions in `examples/` — our own content, free to
+  emulate: `dont-read-this-bot`, `build-it-yourself`, `ai-jobs-doom-boom`,
+  `ai-interface-mcp`, `thrivepact-case-study`, `ai-codes-shortcuts`, `start-here`.
+- **Long-form calibration sample:** Lyn Alden's public essays were analyzed *only* to
+  measure which general writing techniques mark clear human prose. We do **not** emulate
+  her voice or reuse her text. Her essays are **not** redistributed in this repo; pull
+  them locally for your own analysis with `examples/lyn-alden/fetch-lyn.sh <slug>` and
+  respect lynalden.com's terms. The rules above are general craft in our own words.
 - See also `no-slop-rules.md` for the strip-it-out rules.
