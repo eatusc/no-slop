@@ -95,6 +95,28 @@ A running log of the app and the caption-conversion work.
 
 ---
 
+## 2026-06-27 — API + CLI, creator research, GitHub
+
+- **De-slop API**: `POST /api/deslop` (raw text or JSON) → `{clean, slop, fixes, flags,
+  words}`; `?clean=1` returns plain text. CORS open. Served by the Vite middleware on
+  4242, importing the same `src/deslop.js` as the app. Added an **API tab** (API.md,
+  editable) and a copy-paste LLM instruction block in `API.md`.
+- **CLI**: `cli/deslop.mjs` — `echo text | node cli/deslop.mjs [--report|--json]`,
+  `npm run deslop`. Same engine, no server needed.
+- **Flags**: engine now detects the "it's not X, it's Y" antithesis family (Hormozi's
+  #1 tell) + "not just X but Y" / "X isn't Y, it's Z" / "not about X, it's about Y".
+  Not auto-rewritten — surfaced as ⚑ chips in the UI, `flags` in the API, and weighted
+  hardest in the Slopometer. Removed the old crude `not only` auto-swap.
+- **Creator research → rules**: added §0 (antithesis pattern) and a "Field notes —
+  what creators flag" table to `no-slop-rules.md` (Hormozi, Peter Yang, Nassery,
+  Ramonov, Stolte, Vyas, Wize AI), plus two principles: refine-don't-generate (Leila
+  Hormozi) and the anti-style-file method.
+- **GitHub**: pushed to https://github.com/eatusc/no-slop (public, main). Excluded
+  `node_modules` and `examples/lyn-alden/*.txt` (third-party copyright — regenerate via
+  `fetch-lyn.sh`). Added `README.md`.
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.
