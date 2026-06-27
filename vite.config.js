@@ -131,10 +131,14 @@ function deslopResult(text) {
   }
 }
 
+const MAX_BODY = 4 * 1024 * 1024 // 4MB cap so a huge POST can't exhaust memory
 function readBody(req) {
   return new Promise((resolve) => {
     let d = ''
-    req.on('data', (c) => (d += c))
+    req.on('data', (c) => {
+      d += c
+      if (d.length > MAX_BODY) { req.destroy(); resolve('') } // too big -> treat as empty
+    })
     req.on('end', () => resolve(d))
     req.on('error', () => resolve(''))
   })
@@ -154,11 +158,21 @@ function noslopApi() {
     const url = new URL(req.url, 'http://localhost')
     const route = url.pathname
 
-    // allow agents / tools to call the API from anywhere
+    // Cross-origin guard (CSRF defense). This server can run your CLI and write
+    // files, so a website you visit must NOT be able to drive it. Browsers always
+    // attach an Origin header on cross-origin requests; reject anything not from
+    // localhost. CLI tools / agents (curl) send no Origin and are allowed, and the
+    // app itself is same-origin. No wildcard CORS header is set, so other origins
+    // also can't read any response.
     if (route.startsWith('/api/')) {
-      res.setHeader('Access-Control-Allow-Origin', '*')
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+      const origin = req.headers.origin
+      if (origin) {
+        let host = ''
+        try { host = new URL(origin).hostname } catch (_) {}
+        if (host !== 'localhost' && host !== '127.0.0.1') {
+          return json(res, 403, { error: 'cross-origin requests are not allowed' })
+        }
+      }
       if (req.method === 'OPTIONS') { res.writeHead(204); return res.end() }
     }
 
@@ -194,6 +208,8 @@ function noslopApi() {
         let text = '', engine = 'claude'
         try { const j = JSON.parse(body); text = j.text || ''; engine = j.engine || 'claude' } catch (_) {}
         if (!text.trim()) return json(res, 400, { error: 'No text provided.' })
+        if (text.length > 40000) return json(res, 400, { error: 'Text too long (40k char limit).' })
+        if (engine !== 'claude' && engine !== 'codex') engine = 'claude' // whitelist the engine
         const system = buildSystemPrompt()
         try {
           const output = engine === 'codex' ? await runCodex(system, text) : await runClaude(system, text)
@@ -213,6 +229,7 @@ function noslopApi() {
         let input = '', output = '', engine = ''
         try { const j = JSON.parse(body); input = j.input || ''; output = j.output || ''; engine = j.engine || '' } catch (_) {}
         if (!input.trim() || !output.trim()) return json(res, 400, { error: 'Need both input and output.' })
+        if (input.length > 40000 || output.length > 40000) return json(res, 400, { error: 'Example too long (40k char limit).' })
         const entry = JSON.stringify({ input, output, engine, ts: new Date().toISOString() })
         fs.appendFileSync(LEARNED_FILE, entry + '\n')
         const { seed, learned } = loadStyleExamples()
@@ -272,6 +289,8 @@ function noslopApi() {
 // No Slop runs on its own dedicated, permanent port (4242).
 export default defineConfig({
   plugins: [noslopApi()],
-  server: { host: '127.0.0.1', port: 4242, strictPort: true },
-  preview: { host: '127.0.0.1', port: 4242, strictPort: true },
+  // bind to loopback only (never the LAN), and disable Vite's own permissive
+  // dev CORS — the app is same-origin and the API has its own origin guard
+  server: { host: '127.0.0.1', port: 4242, strictPort: true, cors: false },
+  preview: { host: '127.0.0.1', port: 4242, strictPort: true, cors: false },
 })

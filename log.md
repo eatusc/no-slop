@@ -6,11 +6,11 @@ A running log of the app and the caption-conversion work.
 
 ## 2026-06-27 — App built
 
-- Created the **No Slop** app at `/Users/ericlai/Sites/localhost/noslop`.
+- Created the **No Slop** app at `~/Sites/localhost/noslop`.
 - Stack: Vite (vanilla JS, no framework — fast install, single dependency).
 - **Dedicated permanent port: 4242** (`http://localhost:4242`). Set in `vite.config.js`
   with `strictPort`, so a plain `npm run dev` always lands there.
-- Dashboard launcher: `/Users/ericlai/Desktop/Apps/Run_NoSlop.command` → app now shows
+- Dashboard launcher: `~/Desktop/Apps/Run_NoSlop.command` → app now shows
   up on the App Dashboard (localhost:4000). First run auto-runs `npm install`.
 - Interface: paste AI text on the left, get the de-slopped version on the right, live.
   Footer shows a count of every fix by category. Copy button. "Try a sample" button.
@@ -20,7 +20,7 @@ A running log of the app and the caption-conversion work.
   best-practice for human-sounding writing to ground it.
 
 ### Caption corpus collected
-- Pulled every `caption.txt` from `/Users/ericlai/Sites/localhost/slideshows`.
+- Pulled every `caption.txt` from `~/Sites/localhost/slideshows`.
 - 33 unique captions (deduped by content) copied into `examples/`, indexed in
   `examples/_index.json` (slug, pipeline stage, word count, source path).
 - These are HAP's real captions — used as the test/conversion set. Note: many are
@@ -176,6 +176,24 @@ distills, and writes in Eric's voice — driven by an LLM via his local CLI (no 
   a "Rewrite this ✦" button. Cmd+Enter rewrites.
 - Verified: SpaceX caption rewrote from a long structured post into punchy distilled lines
   in ~10s, keeping every figure/name/hashtag and adding a take.
+
+---
+
+## 2026-06-27 — Security & cleanup pass (pre-public audit)
+
+- **CSRF/origin guard:** `/api/*` now rejects cross-origin browser requests (Origin not
+  localhost → 403). Since the server can run the CLI and write files, this stops a
+  website you visit from driving it. CLI/agents (no Origin) still work.
+- **Removed wildcard CORS** (`ACAO: *`) and set Vite `server.cors: false`; bound to
+  `127.0.0.1` only. Other origins can't read API responses.
+- **Input caps:** request body ≤ 4MB; rewrite/style text ≤ 40k chars; engine whitelisted.
+- **Shell safety:** CLI calls use `execFile` with arg arrays (no shell), so pasted text
+  can't inject commands.
+- **Privacy:** stripped personal `source` paths (`/Users/ericlai/...`) from
+  `examples/_index.json`; scrubbed the username from `API.md`/`log.md`. No secrets/keys
+  in the repo (verified). Switched commit author to a GitHub noreply email.
+- Verified: all JS syntax-checks; no stray/untracked files; node_modules, learned voice
+  data, and third-party essays all gitignored.
 
 ---
 
