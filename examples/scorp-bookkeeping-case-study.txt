@@ -1,0 +1,13 @@
+Case study: a marketing S-corp was paying every month for bookkeeping and reconciliation software.
+
+We replaced the stack with one dashboard they own.
+
+It handles monthly P&L, bank reconciliation, payroll, federal and CA filings, year-end W-2s and K-1s, tax deposit tracking, and deadline visibility.
+
+The CPA stayed in the loop. The app captures, calculates, and organizes. The accountant verifies and signs.
+
+That is the pattern I like: remove recurring software cost without removing human judgment.
+
+A forever subscription became a one-time build.
+
+#AIAutomation #CustomSoftware #Bookkeeping #SmallBusinessTech #CaseStudy

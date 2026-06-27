@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.log
+
+# third-party essays (copyright) — regenerate locally with examples/lyn-alden/fetch-lyn.sh
+examples/lyn-alden/*.txt

@@ -1,0 +1,15 @@
+Anthropic just released Fable 5, the public version of their Mythos-class model.
+
+We've been running it all week.
+
+Short version: brilliant for coding, expensive enough that you should be deliberate.
+
+Use it like a scalpel. Keep Opus for the volume work.
+
+Fable is included on Claude subscriptions only until June 22. On June 23 it moves to pay-per-use credits only.
+
+If you want to feel the difference yourself, this is the free window.
+
+Building with AI for your business? DM me. This is literally what we do all day.
+
+#AI #Claude #AICoding #Productivity #BusinessAutomation

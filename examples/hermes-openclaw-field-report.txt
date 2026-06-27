@@ -1,0 +1,13 @@
+We actually run Hermes and OpenClaw daily, on one Mac Studio. Here is the real report, not the demo version.
+
+The dream was a fully free agent on local Qwen. We configured it every way we could. On Qwen alone, the agents would not hold together: multi-step plans fell apart and tools got called wrong the moment the task got real.
+
+What fixed it: a frontier model driving. Claude or Codex as the brain. That is the catch nobody puts in the thread. The agent framework is great, but it still needs a serious model steering it.
+
+So where does Qwen fit? We gave it the small jobs. Every day it quietly processes our short scripts and videos: batch transcribing, cleaning and tagging text, renaming files, first-pass summaries. Boring, high-volume work that would burn real money on an API.
+
+The split that finally stuck: frontier brain, local muscle. Claude or Codex for judgment, Qwen on the Mac Studio for the repetitive tasks you run a hundred times a day.
+
+A fully free local agent is not there yet. A hybrid is real, and we run it now.
+
+#AI #AIAgents #OpenSourceAI #LocalLLM #Qwen #BusinessAutomation

@@ -1,0 +1,17 @@
+Case study: AmzDash - the Amazon ads dashboard we built for our clients.
+
+The problem: Amazon ads data is noisy. One bad week makes sellers pause winners and scale losers.
+
+What we built:
+
+- Pulls every campaign + every search term daily via Amazon's Ads API and SP-API, not the console
+- Dashboard with week-over-week deltas on every metric
+- 3 AI analysts review the account in parallel: last 7 days, last 14, full month
+- A 4th AI cross-references them - only findings confirmed by 2+ timeframes survive
+- Output: negative keywords, wasted spend, problem campaigns, winners to scale, ranked with expected impact
+
+One bad week isn't a trend. Three timeframes keep each other honest.
+
+DM "DASH" if you want to see what it says about your account.
+
+#AmazonAds #AmazonSellers #PPC #AmazonFBA #AIAutomation

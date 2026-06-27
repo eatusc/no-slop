@@ -1,0 +1,28 @@
+ThrivePact is not just a habit tracker.
+
+It is a behavior loop:
+
+- make a pact
+- invite the crew
+- check in every day
+- see who showed up
+- keep the streak alive
+- roll into the next 7-day segment
+
+The interesting part was not the landing page.
+
+It was the product logic underneath: OTP auth, Supabase/Postgres with RLS, invite flows, host approval, photo check-ins, streaks, late logs, time zones, notification dedupe, SMS, payments, and weekly settlement mechanics.
+
+That is the difference between building screens and building a product that can hold pressure.
+
+For ThrivePact, trust is the feature.
+
+If reminders fire twice, the product feels spammy.
+If a timezone is wrong, the streak feels unfair.
+If the check-in flow breaks, the whole behavior loop breaks.
+
+That is where the build gets real.
+
+DM me if you want a product team that thinks past the mockup.
+
+#CustomSoftware #ProductDevelopment #NextJS #Supabase #StartupBuild

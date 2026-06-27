@@ -1,0 +1,51 @@
+How to build a fast AI phone agent in GoHighLevel. The simple version. Save it.
+
+Steps:
+
+1. Sign up for GoHighLevel and start the free trial:
+https://www.gohighlevel.com
+
+2. Settings > Phone Numbers > buy a number.
+This is the line your AI answers.
+
+3. Build the Voice AI agent.
+Give it a name, a one-line greeting, your business info, and one clear job: book the appointment or qualify the lead.
+
+4. Make the voice fast.
+Native GHL Voice AI is the simplest path because it handles the voice stack for you.
+
+For more control, run the agent in Vapi and connect it to GHL calendars and workflows:
+https://docs.vapi.ai/tools/go-high-level
+https://help.gohighlevel.com/support/solutions/articles/155000007349-vapi-actions-and-triggers-in-workflows
+
+Fast stack:
+Hear: Deepgram Nova-3
+Think: GPT-4o-mini, or your current preferred low-latency mini model
+Speak: Cartesia Sonic or ElevenLabs Flash v2.5
+Target: under 700ms round trip when your full network, STT, LLM, TTS, and streaming path is tuned well.
+
+5. Route the number to the agent and lower the inbound call timeout.
+HighLevel says if the caller reaches local voicemail, the Voice AI agent will not answer the call.
+https://help.gohighlevel.com/support/solutions/articles/155000003431-inbound-call-flow-for-voice-ai-calls
+https://help.gohighlevel.com/support/solutions/articles/155000006881-phone-number-edit-configuration-incoming-calls-settings-
+
+6. Give it hands in Workflows.
+Update the contact, book on your calendar, transfer to a human when needed, and text a recap after the call.
+
+7. Test it.
+Use GHL's built-in Voice AI tester, call your own agent, try to stump it, then tune.
+https://help.gohighlevel.com/support/solutions/articles/155000004108-testing-voice-ai-agents
+
+Sources for the fast voice stack:
+Deepgram Nova-3 streaming latency:
+https://developers.deepgram.com/docs/measuring-streaming-latency
+
+Cartesia Sonic 3.5:
+https://docs.cartesia.ai/build-with-cartesia/tts-models/latest
+
+ElevenLabs Flash v2.5:
+https://elevenlabs.io/docs/overview/models
+
+Want us to build it for you instead? Message us. We actually reply.
+
+#GoHighLevel #VoiceAI #AIReceptionist #AIAutomation #SmallBusiness #Vapi #Deepgram #ElevenLabs
