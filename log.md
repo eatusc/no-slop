@@ -142,6 +142,17 @@ A running log of the app and the caption-conversion work.
 
 ---
 
+## 2026-06-27 — Fix: footer/chips overlapping text on long input
+
+- Bug: with a long paste, the two-pane `main` grid row auto-sized to the text height,
+  so panes overflowed and the footer chips/legend painted over the content mid-page.
+- Fix: `main { grid-template-rows: minmax(0, 1fr) }` + `.pane { min-height: 0;
+  overflow: hidden }` so each pane scrolls internally and the footer stays pinned.
+- Added a `?text=...` URL param (prefill the de-slopper with URL-encoded text) — handy
+  for sharing/deep-links, and used it to reproduce + verify the fix.
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.
