@@ -3,231 +3,198 @@
     "file": "ai-chaos-highlight-reel.txt",
     "slug": "ai-chaos-highlight-reel",
     "stage": "_archive",
-    "words": 179,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/ai-chaos-highlight-reel-carousel/caption.txt"
+    "words": 179
   },
   {
     "file": "ai-chaos-highlight-reel-2.txt",
     "slug": "ai-chaos-highlight-reel",
     "stage": "3-posted",
-    "words": 177,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/3-posted/hap/ai-chaos-highlight-reel-carousel/caption.txt"
+    "words": 177
   },
   {
     "file": "ai-codes-shortcuts.txt",
     "slug": "ai-codes-shortcuts",
     "stage": "_production",
-    "words": 193,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/ai-codes-shortcuts-carousel/caption.txt"
+    "words": 193
   },
   {
     "file": "ai-consultant.txt",
     "slug": "ai-consultant",
     "stage": "_archive",
-    "words": 95,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/ai-consultant-carousel/caption.txt"
+    "words": 95
   },
   {
     "file": "ai-fake-temporary.txt",
     "slug": "ai-fake-temporary",
     "stage": "_archive",
-    "words": 119,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/ai-fake-temporary-carousel/caption.txt"
+    "words": 119
   },
   {
     "file": "ai-interface-mcp.txt",
     "slug": "ai-interface-mcp",
     "stage": "_production",
-    "words": 223,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/ai-interface-mcp-carousel/caption.txt"
+    "words": 223
   },
   {
     "file": "ai-interface-mcp-original-20260616-165154.txt",
     "slug": "ai-interface-mcp-original-20260616-165154",
     "stage": "_archive",
-    "words": 95,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/ai-interface-mcp-carousel-original-20260616-165154/caption.txt"
+    "words": 95
   },
   {
     "file": "ai-jobs-doom-boom.txt",
     "slug": "ai-jobs-doom-boom",
     "stage": "_production",
-    "words": 195,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/ai-jobs-doom-boom-carousel/caption.txt"
+    "words": 195
   },
   {
     "file": "ai-phone.txt",
     "slug": "ai-phone",
     "stage": "_archive",
-    "words": 120,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/ai-phone-carousel/caption.txt"
+    "words": 120
   },
   {
     "file": "ai-tip-prompts-like-code.txt",
     "slug": "ai-tip-prompts-like-code",
     "stage": "2-ready",
-    "words": 106,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/2-ready/instagram/ai-tip-prompts-like-code-carousel/caption.txt"
+    "words": 106
   },
   {
     "file": "ai-vs-experts-scoreboard.txt",
     "slug": "ai-vs-experts-scoreboard",
     "stage": "1-converting",
-    "words": 213,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/1-converting/hap/ai-vs-experts-scoreboard-carousel/caption.txt"
+    "words": 213
   },
   {
     "file": "ai-vs-experts-scoreboard-2.txt",
     "slug": "ai-vs-experts-scoreboard",
     "stage": "_production",
-    "words": 212,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/ai-vs-experts-scoreboard-carousel/caption.txt"
+    "words": 212
   },
   {
     "file": "ai-vs-tutorials.txt",
     "slug": "ai-vs-tutorials",
     "stage": "_archive",
-    "words": 101,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/ai-vs-tutorials-carousel/caption.txt"
+    "words": 101
   },
   {
     "file": "amzdash-case-study.txt",
     "slug": "amzdash-case-study",
     "stage": "_archive",
-    "words": 134,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/amzdash-case-study-carousel/caption.txt"
+    "words": 134
   },
   {
     "file": "amzdash-case-study-2.txt",
     "slug": "amzdash-case-study",
     "stage": "3-posted",
-    "words": 134,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/3-posted/hap/amzdash-case-study-carousel/caption.txt"
+    "words": 134
   },
   {
     "file": "build-it-yourself.txt",
     "slug": "build-it-yourself",
     "stage": "2-ready",
-    "words": 177,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/2-ready/instagram/build-it-yourself-carousel/caption.txt"
+    "words": 177
   },
   {
     "file": "claude-cli-folder.txt",
     "slug": "claude-cli-folder",
     "stage": "_production",
-    "words": 128,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/claude-cli-folder-carousel/caption.txt"
+    "words": 128
   },
   {
     "file": "claude-cli-folder-2.txt",
     "slug": "claude-cli-folder",
     "stage": "3-posted",
-    "words": 122,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/3-posted/hap/claude-cli-folder-carousel/caption.txt"
+    "words": 122
   },
   {
     "file": "consultant-vs-inhouse.txt",
     "slug": "consultant-vs-inhouse",
     "stage": "_rejected",
-    "words": 91,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_rejected/consultant-vs-inhouse-carousel/caption.txt"
+    "words": 91
   },
   {
     "file": "dont-read-this-bot.txt",
     "slug": "dont-read-this-bot",
     "stage": "2-ready",
-    "words": 99,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/2-ready/instagram/dont-read-this-bot-carousel/caption.txt"
+    "words": 99
   },
   {
     "file": "expert-ai-unbundled.txt",
     "slug": "expert-ai-unbundled",
     "stage": "_archive",
-    "words": 85,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/expert-ai-unbundled-carousel/caption.txt"
+    "words": 85
   },
   {
     "file": "fable-5.txt",
     "slug": "fable-5",
     "stage": "_archive",
-    "words": 94,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/fable-5-carousel/caption.txt"
+    "words": 94
   },
   {
     "file": "fake-internet-real-audience.txt",
     "slug": "fake-internet-real-audience",
     "stage": "1-converting",
-    "words": 259,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/1-converting/hap/fake-internet-real-audience-carousel/caption.txt"
+    "words": 259
   },
   {
     "file": "ghl-voice-agent-setup.txt",
     "slug": "ghl-voice-agent-setup",
     "stage": "2-ready",
-    "words": 266,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/2-ready/instagram/ghl-voice-agent-setup-carousel/caption.txt"
+    "words": 266
   },
   {
     "file": "helpaproduct-soft-plug.txt",
     "slug": "helpaproduct-soft-plug",
     "stage": "_archive",
-    "words": 51,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/helpaproduct-soft-plug-carousel/caption.txt"
+    "words": 51
   },
   {
     "file": "hermes-openclaw.txt",
     "slug": "hermes-openclaw",
     "stage": "_archive",
-    "words": 116,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/hermes-openclaw-carousel/caption.txt"
+    "words": 116
   },
   {
     "file": "hermes-openclaw-field-report.txt",
     "slug": "hermes-openclaw-field-report",
     "stage": "2-ready",
-    "words": 193,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/2-ready/instagram/hermes-openclaw-field-report-carousel/caption.txt"
+    "words": 193
   },
   {
     "file": "scorp-bookkeeping-case-study.txt",
     "slug": "scorp-bookkeeping-case-study",
     "stage": "_archive",
-    "words": 87,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/scorp-bookkeeping-case-study-carousel/caption.txt"
+    "words": 87
   },
   {
     "file": "spacex-ipo.txt",
     "slug": "spacex-ipo",
     "stage": "_archive",
-    "words": 178,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/dated/spacex-ipo-carousel/caption.txt"
+    "words": 178
   },
   {
     "file": "start-here.txt",
     "slug": "start-here",
     "stage": "_production",
-    "words": 88,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/start-here-carousel/caption.txt"
+    "words": 88
   },
   {
     "file": "thrivepact-case-study.txt",
     "slug": "thrivepact-case-study",
     "stage": "_production",
-    "words": 153,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/thrivepact-case-study-carousel/caption.txt"
+    "words": 153
   },
   {
     "file": "ubi-check-or-share.txt",
     "slug": "ubi-check-or-share",
     "stage": "_production",
-    "words": 136,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_production/hap/ubi-check-or-share-carousel/caption.txt"
+    "words": 136
   },
   {
     "file": "zz-prod-1781633916.txt",
     "slug": "zz-prod-1781633916",
     "stage": "_archive",
-    "words": 7,
-    "source": "/Users/YOUR_USER/Sites/localhost/[redacted]/_archive/_box/zz-prod-1781633916/caption.txt"
+    "words": 7
   }
 ]

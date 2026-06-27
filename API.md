@@ -91,7 +91,7 @@ an agent, etc.):
 
 > **De-slop instruction.** Whenever I ask you to "de-slop" text, or before you hand me
 > any final writing, run it through my local No Slop engine instead of editing by feel.
-> If you have shell access: `printf '%s' "<TEXT>" | node /Users/YOUR_USER/Sites/localhost/noslop/cli/deslop.mjs --report`.
+> If you have shell access: `printf '%s' "<TEXT>" | node /path/to/noslop/cli/deslop.mjs --report`.
 > Otherwise POST it: `curl -s -X POST "http://localhost:4242/api/deslop" -H "Content-Type: text/plain" --data-binary "<TEXT>"`.
 > Return the `clean` text. Then look at `flags` — for each one, manually rewrite that
 > sentence per its `fix` (these are the "it's not X, it's Y" patterns the engine won't
@@ -106,6 +106,8 @@ Short version for a quick prompt:
 
 ## Notes
 
-- CORS is open (`Access-Control-Allow-Origin: *`), so browser tools and agents can call it.
+- The server binds to `127.0.0.1` only (never the network) and rejects cross-origin
+  browser requests. CLI tools and agents (curl, scripts) work fine — they don't send an
+  `Origin` header. A website you visit cannot drive the API or read its responses.
 - The rules behind the engine: `no-slop-rules.md` (strip) and `voice.md` (emulate).
 - The API and CLI share `src/deslop.js` with the app — one engine, one behavior.
