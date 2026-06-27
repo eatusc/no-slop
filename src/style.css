@@ -303,6 +303,37 @@ footer {
 }
 .toast.show { opacity: 1; }
 
+/* ---------- rewrite view ---------- */
+.rw-bar {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 8px 40px 16px;
+}
+.rw-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 500;
+}
+.rw-voice { white-space: nowrap; }
+.rw-select {
+  font: 11px var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 8px;
+  cursor: pointer;
+}
+.rw-select:focus { outline: none; border-color: var(--ink); }
+#rw-output { color: #2c2a26; }
+.go.small { padding: 9px 16px; font-size: 11px; }
+#rw-foot { gap: 14px; }
+.go:disabled { opacity: 0.45; cursor: wait; }
+.rw-running { color: var(--accent); }
+
 /* ---------- examples view ---------- */
 .ex-wrap {
   flex: 1;

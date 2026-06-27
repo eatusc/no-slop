@@ -123,6 +123,7 @@ $('sample').addEventListener('click', () => {
 const tabs = [...document.querySelectorAll('.tab')]
 const views = {
   deslop: document.getElementById('view-deslop'),
+  rewrite: document.getElementById('view-rewrite'),
   examples: document.getElementById('view-examples'),
   rules: document.getElementById('view-rules'),
   voice: document.getElementById('view-voice'),
@@ -136,6 +137,7 @@ function switchTab(name) {
   for (const k in views) views[k].classList.toggle('active', k === name)
   if (location.hash.slice(1) !== name) history.replaceState(null, '', '#' + name)
   if (name === 'examples' && !examplesLoaded) loadExamples()
+  if (name === 'rewrite' && !rewriteInit) initRewrite()
   if (name === 'rules' && !rulesDoc.isLoaded()) rulesDoc.load()
   if (name === 'voice' && !voiceDoc.isLoaded()) voiceDoc.load()
   if (name === 'api' && !apiDoc.isLoaded()) apiDoc.load()
@@ -201,6 +203,111 @@ exLoad.addEventListener('click', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Rewrite tab (AI) — heavy rewrite via the claude/codex CLI + learning loop
+// ---------------------------------------------------------------------------
+const rwInput = $('rw-input')
+const rwOutput = $('rw-output')
+const rwInCount = $('rw-in-count')
+const rwOutCount = $('rw-out-count')
+const rwStatus = $('rw-status')
+const rwSlop = $('rw-slop')
+const rwEngine = $('rw-engine')
+const rwVoice = $('rw-voice')
+const rwGo = $('rw-go')
+let rwLastInput = ''
+let rwBusy = false
+let rewriteInit = false
+
+function setVoiceCount(total, learned) {
+  rwVoice.textContent = `voice: ${total} examples (${learned} learned)`
+}
+async function loadVoiceCount() {
+  try {
+    const d = await (await fetch('/api/style')).json()
+    setVoiceCount(d.total, d.learnedCount)
+  } catch (_) { rwVoice.textContent = 'voice: —' }
+}
+function initRewrite() { rewriteInit = true; loadVoiceCount(); updateRwCounts() }
+
+function updateRwCounts() {
+  rwInCount.textContent = words(rwInput.value) + ' words'
+  rwOutCount.textContent = words(rwOutput.value) + ' words'
+  const a = rwLastInput.trim() ? slopScore(rwLastInput).score : null
+  const b = rwOutput.value.trim() ? slopScore(rwOutput.value).score : null
+  rwSlop.textContent = a != null && b != null ? `slop ${a} → ${b}` : ''
+}
+
+function setRwBusy(on, label) {
+  rwBusy = on
+  rwGo.disabled = on
+  rwStatus.textContent = label || ''
+  rwStatus.classList.toggle('rw-running', on)
+}
+
+async function doRewrite() {
+  const text = rwInput.value.trim()
+  if (!text || rwBusy) return
+  rwLastInput = text
+  const engine = rwEngine.value
+  setRwBusy(true, `Rewriting with ${engine}… (~10–40s)`)
+  rwOutput.value = ''
+  try {
+    const r = await fetch('/api/rewrite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, engine }),
+    })
+    const d = await r.json()
+    if (!r.ok || d.error) throw new Error(d.error || 'rewrite failed')
+    rwOutput.value = d.output || ''
+    setRwBusy(false, 'done — edit it, then “Add to my voice”')
+    updateRwCounts()
+  } catch (err) {
+    setRwBusy(false, '')
+    alert('Rewrite failed: ' + err.message + '\n\nIs the No Slop server running, and is the CLI logged in?')
+  }
+}
+
+rwInput.addEventListener('input', updateRwCounts)
+rwOutput.addEventListener('input', updateRwCounts)
+rwGo.addEventListener('click', doRewrite)
+$('rw-regen').addEventListener('click', doRewrite)
+$('rw-sample').addEventListener('click', () => { rwInput.value = SAMPLE; updateRwCounts() })
+$('rw-clear').addEventListener('click', () => {
+  rwInput.value = ''; rwOutput.value = ''; rwLastInput = ''; rwStatus.textContent = ''
+  updateRwCounts(); rwInput.focus()
+})
+$('rw-copy').addEventListener('click', async () => {
+  if (!rwOutput.value) return
+  try { await navigator.clipboard.writeText(rwOutput.value) } catch (_) {}
+})
+$('rw-save').addEventListener('click', async () => {
+  const input2 = rwLastInput.trim(), output = rwOutput.value.trim()
+  if (!input2 || !output) { alert('Rewrite something first, then save.'); return }
+  try {
+    const r = await fetch('/api/style', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: input2, output, engine: rwEngine.value }),
+    })
+    const d = await r.json()
+    if (!r.ok || d.error) throw new Error(d.error || 'save failed')
+    setVoiceCount(d.total, d.learnedCount)
+    const t = $('rw-saved'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800)
+  } catch (err) { alert('Save failed: ' + err.message) }
+})
+
+// "Rewrite this ✦" from the Examples tab loads the caption and runs a rewrite
+$('ex-rewrite').addEventListener('click', () => {
+  if (!exCurrent) return
+  rwInput.value = exCurrent.text
+  rwOutput.value = ''
+  switchTab('rewrite')
+  updateRwCounts()
+  doRewrite()
+})
+
+// ---------------------------------------------------------------------------
 // Doc editor tabs (Rules, Voice, API) — view + edit a markdown file on disk
 // ---------------------------------------------------------------------------
 function setupDoc(name, apiPath) {
@@ -246,6 +353,7 @@ document.addEventListener('keydown', (e) => {
   if (views.rules.classList.contains('active')) rulesDoc.save()
   else if (views.voice.classList.contains('active')) voiceDoc.save()
   else if (views.api.classList.contains('active')) apiDoc.save()
+  else if (views.rewrite.classList.contains('active')) doRewrite()
   else run()
 })
 
