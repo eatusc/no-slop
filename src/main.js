@@ -252,8 +252,10 @@ document.addEventListener('keydown', (e) => {
 // open the tab named in the URL hash on load (#examples / #rules), default de-slop
 if (location.hash) switchTab(location.hash.slice(1))
 
-// ?demo preloads the sample so the highlights are visible immediately
-if (new URLSearchParams(location.search).has('demo')) input.value = SAMPLE
+// ?demo preloads the sample; ?text=... prefills with arbitrary (URL-encoded) text
+const params = new URLSearchParams(location.search)
+if (params.has('text')) input.value = params.get('text')
+else if (params.has('demo')) input.value = SAMPLE
 
 run()
 if (views.deslop.classList.contains('active')) input.focus()
