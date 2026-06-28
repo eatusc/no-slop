@@ -307,6 +307,70 @@ $('ex-rewrite').addEventListener('click', () => {
   doRewrite()
 })
 
+// ---- voice examples viewer / pruner + consolidate ----
+const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
+const exmOverlay = $('exm-overlay')
+const exmList = $('exm-list')
+const exmSub = $('exm-sub')
+
+function renderExamples(data) {
+  exmSub.textContent = `${data.total} total · ${data.seedCount} seed (locked) · ${data.learnedCount} learned`
+  const items = data.learned || []
+  if (!items.length) {
+    exmList.innerHTML = '<div class="muted small" style="padding:14px 0">No learned examples yet. Rewrite something, then “Add to my voice”.</div>'
+    return
+  }
+  exmList.innerHTML = items.map((p, i) => {
+    const a = esc((p.input || '').replace(/\s+/g, ' ').slice(0, 70))
+    const b = esc((p.output || '').replace(/\s+/g, ' ').slice(0, 70))
+    return `<div class="exm-row"><div class="exm-text">` +
+      `<div class="exm-a"><del>${a}…</del></div><div class="exm-b">→ ${b}…</div></div>` +
+      `<button class="exm-del" data-i="${i}" title="Delete this example">✕</button></div>`
+  }).join('')
+  exmList.querySelectorAll('.exm-del').forEach((btn) =>
+    btn.addEventListener('click', () => deleteExample(parseInt(btn.dataset.i, 10))))
+}
+
+async function openExamples() {
+  try {
+    const data = await (await fetch('/api/style')).json()
+    renderExamples(data)
+    exmOverlay.classList.add('open')
+  } catch (_) { alert('Could not load examples.') }
+}
+
+async function deleteExample(i) {
+  if (!confirm('Delete this learned example? This cannot be undone.')) return
+  try {
+    const data = await (await fetch('/api/style?index=' + i, { method: 'DELETE' })).json()
+    renderExamples(data)
+    setVoiceCount(data.total, data.learnedCount)
+  } catch (_) { alert('Delete failed.') }
+}
+
+async function consolidateVoice() {
+  const btn = $('rw-consolidate')
+  if (!confirm('Distill all your saved edits into rules and write them into voice.md?\n(Uses the claude CLI — takes ~15–60s.)')) return
+  const prev = btn.textContent
+  btn.textContent = 'Distilling…'; btn.disabled = true
+  try {
+    const r = await fetch('/api/consolidate', { method: 'POST' })
+    const d = await r.json()
+    if (!r.ok || d.error) throw new Error(d.error || 'failed')
+    voiceDoc.load() // refresh the Voice tab so it shows the new section
+    alert(`Done — distilled ${d.count} edits into a "Learned rules" section in voice.md.\nOpen the Voice tab to see it.`)
+  } catch (err) {
+    alert('Consolidate failed: ' + err.message)
+  } finally {
+    btn.textContent = prev; btn.disabled = false
+  }
+}
+
+$('rw-view').addEventListener('click', openExamples)
+$('rw-consolidate').addEventListener('click', consolidateVoice)
+$('exm-close').addEventListener('click', () => exmOverlay.classList.remove('open'))
+exmOverlay.addEventListener('click', (e) => { if (e.target === exmOverlay) exmOverlay.classList.remove('open') })
+
 // ---------------------------------------------------------------------------
 // Doc editor tabs (Rules, Voice, API) — view + edit a markdown file on disk
 // ---------------------------------------------------------------------------

@@ -197,6 +197,27 @@ distills, and writes in Eric's voice — driven by an LLM via his local CLI (no 
 
 ---
 
+## 2026-06-28 — Hybrid learning: retrieval + consolidate + viewer
+
+Made the learning loop scale to hundreds of examples instead of "last 10 raw pairs."
+
+- **Retrieval** — `selectExamples()` scores each saved pair against the text being
+  rewritten (lexical cosine, stopword-filtered, zero-dependency) and injects the seed +
+  top-8 most relevant (padded with recent). `buildSystemPrompt(text)` now takes the
+  input. Verified: rewriting "…leverages seamless synergy" pulled the synergy/buzzword
+  pairs specifically.
+- **Consolidate voice** — `POST /api/consolidate` feeds all saved before→after edits to
+  the claude CLI, distills 8–15 imperative rules ("Cut corporate buzzwords entirely…",
+  "Open by stating the old belief plainly, then knock it down"), and writes them into a
+  marker-bounded `<!-- LEARNED:START/END -->` section of `voice.md` (replaces in place,
+  preserves the hand-written voice). Button in the Rewrite toolbar.
+- **Viewer / pruner** — "View" opens a modal listing learned pairs (before→after preview)
+  with per-row delete (`DELETE /api/style?index=`). Saves now carry an `id`.
+- Storage is still flat files (JSONL + markdown) — no DB. SQLite is the upgrade path if
+  it ever needs indexed retrieval at thousands of pairs.
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.

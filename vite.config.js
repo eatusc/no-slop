@@ -38,6 +38,41 @@ function loadStyleExamples() {
 
 const clip = (s, n) => (s.length > n ? s.slice(0, n) + '…' : s)
 
+// ---------------------------------------------------------------------------
+// Retrieval — pick the most RELEVANT saved examples for the text being rewritten,
+// so the style bank scales to hundreds without bloating the prompt. Lightweight
+// lexical cosine similarity (no embeddings, no dependency).
+// ---------------------------------------------------------------------------
+const STOPWORDS = new Set(('the a an and or but to of in on for with at by from is are was were be been being it this that these those you your we our us they them their i my me he she his her as if so not no do does did have has had will would can could should may might about into out up down over under more most just like get got make made one two new now then here there what which who when where why how').split(/\s+/))
+const tokenize = (s) => (String(s).toLowerCase().match(/[a-z0-9']+/g) || []).filter((w) => w.length > 2 && !STOPWORDS.has(w))
+function termFreq(tokens) {
+  const m = new Map()
+  for (const t of tokens) m.set(t, (m.get(t) || 0) + 1)
+  return m
+}
+function cosine(a, b) {
+  let dot = 0
+  for (const [k, v] of a) { const w = b.get(k); if (w) dot += v * w }
+  let na = 0; for (const v of a.values()) na += v * v
+  let nb = 0; for (const v of b.values()) nb += v * v
+  return na && nb ? dot / Math.sqrt(na * nb) : 0
+}
+// seed always included; then the top-N learned by similarity, padded with the
+// most recent if retrieval finds few relevant ones.
+function selectExamples(inputText, { seed, learned }, n) {
+  if (!learned.length) return [...seed]
+  const q = termFreq(tokenize(inputText || ''))
+  if (q.size === 0) return [...seed, ...learned.slice(-n)]
+  const scored = learned
+    .map((p) => ({ p, score: cosine(q, termFreq(tokenize(p.input || ''))) }))
+    .sort((a, b) => b.score - a.score)
+  const picked = scored[0].score > 0 ? scored.slice(0, n).map((s) => s.p) : []
+  for (let i = learned.length - 1; i >= 0 && picked.length < n; i--) {
+    if (!picked.includes(learned[i])) picked.push(learned[i])
+  }
+  return [...seed, ...picked]
+}
+
 // A distilled tells list — NOT the full swap table from no-slop-rules.md.
 // Dumping the word-for-word swaps makes the model do literal substitutions
 // instead of rewriting; this keeps it as "avoid these," not "swap these."
@@ -49,13 +84,14 @@ const TELLS = `- Em-dashes, curly quotes, and emoji.
 - The antithesis tic: "it's not X, it's Y" / "not just X but Y" / "this isn't about X, it's about Y".
 - Rule-of-three lists, even sentence length, hedging, vague nouns (solutions, journey, landscape), and saying nothing.`
 
-function buildSystemPrompt() {
+function buildSystemPrompt(inputText) {
   // Strip the italic example quotes (`*"..."*`) from voice.md — the model tends
   // to parrot those isolated sentences as openers. Keep the principles/headers.
   const voice = readFileSafe(path.join(root, 'voice.md'))
     .split('\n').filter((l) => !l.includes('*"')).join('\n')
-  const { seed, learned } = loadStyleExamples()
-  const pairs = [...seed, ...learned.slice(-10)]
+  const store = loadStyleExamples()
+  // retrieve the most relevant examples for THIS text (scales to hundreds)
+  const pairs = selectExamples(inputText, store, 8)
   const examples = pairs.map((p, i) =>
     `### Example ${i + 1}\nBEFORE (sloppy / AI):\n${clip(p.input || '', 1400)}\n\nAFTER (my voice — what I want):\n${clip(p.output || '', 1400)}`
   ).join('\n\n')
@@ -237,7 +273,7 @@ function noslopApi() {
         if (!text.trim()) return json(res, 400, { error: 'No text provided.' })
         if (text.length > 40000) return json(res, 400, { error: 'Text too long (40k char limit).' })
         if (engine !== 'claude' && engine !== 'codex') engine = 'claude' // whitelist the engine
-        const system = buildSystemPrompt()
+        const system = buildSystemPrompt(text)
         try {
           const output = engine === 'codex' ? await runCodex(system, text) : await runClaude(system, text)
           return json(res, 200, { output, engine })
@@ -257,10 +293,55 @@ function noslopApi() {
         try { const j = JSON.parse(body); input = j.input || ''; output = j.output || ''; engine = j.engine || '' } catch (_) {}
         if (!input.trim() || !output.trim()) return json(res, 400, { error: 'Need both input and output.' })
         if (input.length > 40000 || output.length > 40000) return json(res, 400, { error: 'Example too long (40k char limit).' })
-        const entry = JSON.stringify({ input, output, engine, ts: new Date().toISOString() })
+        const id = 'ex_' + Date.now() + '_' + Math.floor(Math.random() * 1e6)
+        const entry = JSON.stringify({ id, input, output, engine, ts: new Date().toISOString() })
         fs.appendFileSync(LEARNED_FILE, entry + '\n')
         const { seed, learned } = loadStyleExamples()
         return json(res, 200, { ok: true, total: seed.length + learned.length, learnedCount: learned.length })
+      }
+      if (route === '/api/style' && req.method === 'DELETE') {
+        const idx = parseInt(url.searchParams.get('index'), 10)
+        const lines = readFileSafe(LEARNED_FILE).split('\n').filter(Boolean)
+        if (Number.isInteger(idx) && idx >= 0 && idx < lines.length) {
+          lines.splice(idx, 1)
+          fs.writeFileSync(LEARNED_FILE, lines.length ? lines.join('\n') + '\n' : '')
+        }
+        const { seed, learned } = loadStyleExamples()
+        return json(res, 200, { ok: true, seedCount: seed.length, learnedCount: learned.length, total: seed.length + learned.length, learned })
+      }
+
+      // ---- consolidate: distill saved edits into rules, write into voice.md ----
+      if (route === '/api/consolidate' && req.method === 'POST') {
+        const { seed, learned } = loadStyleExamples()
+        if (learned.length < 3) return json(res, 400, { error: 'Add at least 3 examples to your voice first, then consolidate.' })
+        const corpus = [...seed, ...learned].map((p, i) =>
+          `### Edit ${i + 1}\nBEFORE:\n${clip(p.input || '', 1200)}\n\nAFTER (my rewrite):\n${clip(p.output || '', 1200)}`
+        ).join('\n\n')
+        const prompt = `Below are my BEFORE→AFTER writing edits — sloppy/AI text and how I rewrote each one. Study them and extract the recurring PATTERNS of how I rewrite: what I cut, what I keep, how I restructure, my openers and closers, sentence rhythm, vocabulary, and how I add opinion.
+
+Output a tight markdown bullet list of 8–15 concrete, specific rules written in the imperative (e.g. "- Cut the intro and open on the strongest claim."). They must reflect what these specific edits actually do. No preamble, no headings, no commentary — ONLY the bullet list.
+
+${corpus}`
+        let rules = ''
+        try {
+          rules = await runCli(CLAUDE_BIN, ['-p', prompt, '--model', CLAUDE_MODEL, '--output-format', 'text'])
+        } catch (err) {
+          return json(res, 500, { error: 'consolidate failed: ' + err.message })
+        }
+        // write/replace a marked section in voice.md so the hand-written voice is preserved
+        const voicePath = path.join(root, 'voice.md')
+        let doc = readFileSafe(voicePath)
+        const START = '<!-- LEARNED:START -->', END = '<!-- LEARNED:END -->'
+        const section = `${START}\n## Learned rules — auto-distilled from ${learned.length} of my saved edits\n\n${rules}\n${END}`
+        if (doc.includes(START) && doc.includes(END)) {
+          doc = doc.replace(new RegExp(START + '[\\s\\S]*?' + END), () => section)
+        } else {
+          doc = doc.trimEnd() + '\n\n---\n\n' + section + '\n'
+        }
+        const tmp = voicePath + '.tmp'
+        fs.writeFileSync(tmp, doc)
+        fs.renameSync(tmp, voicePath)
+        return json(res, 200, { ok: true, rules, count: learned.length })
       }
 
       if (route === '/api/examples' && req.method === 'GET') {
