@@ -394,6 +394,13 @@ footer {
   border-right: 1px solid var(--line);
   padding: 8px 18px 24px 0;
 }
+.ex-head {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 10px 6px;
+}
 .ex-item {
   display: flex;
   align-items: baseline;
@@ -404,6 +411,23 @@ footer {
 }
 .ex-item:hover { background: var(--panel); }
 .ex-item.active { background: var(--panel); }
+.ex-act {
+  flex: none;
+  align-self: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 5px;
+  opacity: 0;
+}
+.ex-item:hover .ex-act { opacity: 1; }
+.ex-act:hover { color: var(--accent); }
+.ex-dismissed { opacity: 0.5; }
+.ex-dismissed .slug { text-decoration: line-through; }
+.ex-dismissed .ex-act { opacity: 1; }
 .ex-item .slug { font-family: var(--serif); font-size: 15px; flex: 1; min-width: 0; }
 .ex-item .stage {
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);

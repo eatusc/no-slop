@@ -218,6 +218,23 @@ Made the learning loop scale to hundreds of examples instead of "last 10 raw pai
 
 ---
 
+## 2026-06-28 — Import zencub_social responses + dismiss examples
+
+- Reviewed `~/Sites/localhost/zencub_social` (Vite+React "Social Ops" dashboard;
+  responses live in `data/app-state.json` → `redditQueue`/`xQueue`/`drafts`).
+- Imported **56 response drafts** (44 posted/queued/skipped Reddit replies + 11 X posts,
+  excluding "removed") into `examples/` as `zencub-*.txt`. These are natural human BJJ
+  replies — many already clean (low slop), which is the point.
+- **Privacy:** zencub files are **gitignored** (`examples/zencub-*.txt`) — they include
+  unposted drafts and must not hit the public repo. To still show them locally, the
+  `/api/examples` route now **scans the folder** and enriches from `_index.json` (which
+  stays HAP-only) instead of relying on the index alone.
+- **Dismiss feature:** each example row has a ✕ to dismiss (it may already be clean) and
+  ↩ to restore; a "show N dismissed" toggle. State persists in `examples/_dismissed.json`
+  (gitignored) via `POST /api/examples/dismiss` (filename-validated against traversal).
+
+---
+
 ## Conversion progress
 
 Working through `examples/` one at a time. Mark each as we go.
