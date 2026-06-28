@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
-import { execFile } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { deslop, slopScore, flagsFor } from './src/deslop.js'
 
@@ -50,7 +50,10 @@ const TELLS = `- Em-dashes, curly quotes, and emoji.
 - Rule-of-three lists, even sentence length, hedging, vague nouns (solutions, journey, landscape), and saying nothing.`
 
 function buildSystemPrompt() {
+  // Strip the italic example quotes (`*"..."*`) from voice.md — the model tends
+  // to parrot those isolated sentences as openers. Keep the principles/headers.
   const voice = readFileSafe(path.join(root, 'voice.md'))
+    .split('\n').filter((l) => !l.includes('*"')).join('\n')
   const { seed, learned } = loadStyleExamples()
   const pairs = [...seed, ...learned.slice(-10)]
   const examples = pairs.map((p, i) =>
@@ -58,6 +61,8 @@ function buildSystemPrompt() {
   ).join('\n\n')
 
   return `You rewrite AI-sounding text into MY personal voice. You are not an editor — you are a ghostwriter who rewrites from scratch.
+
+CRITICAL OUTPUT RULE: Your entire response must be ONLY the rewritten version of the user's text. No preamble, no commentary, no thinking out loud, no "wrong file", no quoting. The RULES, VOICE, and EXAMPLES sections below are REFERENCE ONLY — never copy, quote, or mention any sentence from them. Rewrite only the user's text (it comes after all this, marked clearly).
 
 THIS IS A HEAVY REWRITE, NOT A LIGHT EDIT. If your draft looks like the input with a few words swapped, you have failed — throw it out and start over.
 - Distill hard. Cut to the core message. The output should be MUCH shorter than the input (often half or less).
@@ -81,31 +86,53 @@ ${TELLS}
 === MY VOICE (study this) ===
 ${voice}
 
-=== BEFORE → AFTER EXAMPLES (this is the target — imitate hard) ===
+=== BEFORE → AFTER EXAMPLES (REFERENCE ONLY — study the transformation, never copy or quote these lines) ===
 ${examples}`
 }
 
-function runClaude(system, userText) {
+// Run a CLI with stdin CLOSED (stdio[0]: 'ignore' → /dev/null). This is critical:
+// both `claude -p` and `codex exec` will block forever waiting on stdin otherwise.
+// If outFile is given, the clean result is read from there (codex --output-last-message);
+// otherwise stdout is used (claude --output-format text).
+function runCli(bin, args, { outFile } = {}) {
   return new Promise((resolve, reject) => {
-    const instruction = `Rewrite the following text in my voice, per the system instructions. Output ONLY the rewrite:\n\n${userText}`
-    const args = ['-p', instruction, '--append-system-prompt', system, '--model', CLAUDE_MODEL, '--output-format', 'text']
-    execFile(CLAUDE_BIN, args, { cwd: root, timeout: 180000, maxBuffer: 20 * 1024 * 1024, env: process.env },
-      (err, stdout, stderr) => {
-        if (err) return reject(new Error((stderr || '').trim() || err.message))
-        resolve((stdout || '').trim())
-      })
+    let child
+    try {
+      child = spawn(bin, args, { cwd: root, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] })
+    } catch (e) { return reject(e) }
+    let stdout = '', stderr = '', killed = false
+    const timer = setTimeout(() => { killed = true; child.kill('SIGKILL') }, 180000)
+    child.stdout.on('data', (d) => { stdout += d; if (stdout.length > 20 * 1024 * 1024) child.kill('SIGKILL') })
+    child.stderr.on('data', (d) => { stderr += d })
+    child.on('error', (e) => { clearTimeout(timer); reject(e) })
+    child.on('close', (code) => {
+      clearTimeout(timer)
+      let fileOut = ''
+      if (outFile) {
+        try { fileOut = fs.readFileSync(outFile, 'utf8').trim() } catch (_) {}
+        try { fs.unlinkSync(outFile) } catch (_) {}
+      }
+      const result = (fileOut || stdout).trim()
+      if (killed) return reject(new Error('timed out after 180s'))
+      if (result) return resolve(result)
+      reject(new Error(stderr.trim() || `${path.basename(bin)} exited with code ${code}`))
+    })
   })
 }
 
+const tmpFile = (tag) => path.join(os.tmpdir(), `noslop-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e6)}.txt`)
+
+function runClaude(system, userText) {
+  const instruction = `Here is MY text to rewrite. Rewrite ONLY this, in my voice, per the system instructions. Output nothing but the rewrite — no preamble, no quoting the guide or examples:\n\n<<<TEXT TO REWRITE>>>\n${userText}\n<<<END>>>`
+  return runCli(CLAUDE_BIN, ['-p', instruction, '--append-system-prompt', system, '--model', CLAUDE_MODEL, '--output-format', 'text'])
+}
+
 function runCodex(system, userText) {
-  return new Promise((resolve, reject) => {
-    const prompt = `${system}\n\n=== TASK ===\nRewrite the following text in my voice, per the instructions above. Output ONLY the rewrite, nothing else:\n\n${userText}`
-    execFile(CODEX_BIN, ['exec', prompt], { cwd: root, timeout: 180000, maxBuffer: 20 * 1024 * 1024, env: process.env },
-      (err, stdout, stderr) => {
-        if (err) return reject(new Error((stderr || '').trim() || err.message))
-        resolve((stdout || '').trim())
-      })
-  })
+  const prompt = `${system}\n\n=== TASK ===\nRewrite the following text in my voice, per the instructions above. Output ONLY the rewrite, nothing else:\n\n${userText}`
+  const outFile = tmpFile('codex')
+  // read-only sandbox + ephemeral so it can't touch files or persist sessions
+  const args = ['exec', '-s', 'read-only', '--skip-git-repo-check', '--ephemeral', '--color', 'never', '-o', outFile, prompt]
+  return runCli(CODEX_BIN, args, { outFile })
 }
 
 // editable markdown docs exposed at /api/doc/<name>
