@@ -8,3 +8,7 @@ examples/lyn-alden/*.txt
 
 # personal learned voice examples (grows as you "Add to my voice"); seed.jsonl is committed
 style/examples.jsonl
+
+# local-only examples imported from other apps (may contain unposted drafts) + dismiss state
+examples/zencub-*.txt
+examples/_dismissed.json

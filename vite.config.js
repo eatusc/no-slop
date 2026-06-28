@@ -8,6 +8,7 @@ import { deslop, slopScore, flagsFor } from './src/deslop.js'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const EXAMPLES_DIR = path.join(root, 'examples')
+const DISMISSED_FILE = path.join(EXAMPLES_DIR, '_dismissed.json') // local: examples hidden as "already clean"
 const STYLE_DIR = path.join(root, 'style')
 const SEED_FILE = path.join(STYLE_DIR, 'seed.jsonl')         // shipped, generic
 const LEARNED_FILE = path.join(STYLE_DIR, 'examples.jsonl')  // local, grows on "Add to my voice"
@@ -28,6 +29,10 @@ const CLAUDE_BIN = whichBin('claude', [process.env.CLAUDE_BIN, path.join(HOME, '
 const CODEX_BIN = whichBin('codex', [process.env.CODEX_BIN, '/opt/homebrew/bin/codex', '/usr/local/bin/codex', path.join(HOME, '.local/bin/codex')])
 
 function readFileSafe(p) { try { return fs.readFileSync(p, 'utf8') } catch (_) { return '' } }
+
+function loadDismissed() {
+  try { return new Set(JSON.parse(readFileSafe(DISMISSED_FILE))) } catch (_) { return new Set() }
+}
 
 function loadStyleExamples() {
   const parse = (txt) => txt.split('\n').filter(Boolean).map((l) => { try { return JSON.parse(l) } catch (_) { return null } }).filter(Boolean)
@@ -345,21 +350,44 @@ ${corpus}`
       }
 
       if (route === '/api/examples' && req.method === 'GET') {
-        let index = []
+        // _index.json provides metadata for the shipped HAP captions; any other
+        // .txt dropped in examples/ (e.g. local-only zencub responses) is picked
+        // up by scanning the folder and enriched with derived metadata.
+        const meta = {}
         try {
-          index = JSON.parse(fs.readFileSync(path.join(EXAMPLES_DIR, '_index.json'), 'utf8'))
-        } catch (_) {
-          // fall back to whatever .txt files are present
-          index = fs.readdirSync(EXAMPLES_DIR)
-            .filter((f) => f.endsWith('.txt'))
-            .map((f) => ({ file: f, slug: f.replace(/\.txt$/, ''), stage: '', words: 0 }))
-        }
-        const items = index.map((it) => {
+          JSON.parse(readFileSafe(path.join(EXAMPLES_DIR, '_index.json'))).forEach((it) => { meta[it.file] = it })
+        } catch (_) {}
+        let files = []
+        try { files = fs.readdirSync(EXAMPLES_DIR).filter((f) => f.endsWith('.txt')) } catch (_) {}
+        const dismissed = loadDismissed()
+        const items = files.map((file) => {
+          const m = meta[file] || { stage: file.startsWith('zencub-') ? 'zencub' : '' }
           let text = ''
-          try { text = fs.readFileSync(path.join(EXAMPLES_DIR, it.file), 'utf8') } catch (_) {}
-          return { ...it, text }
+          try { text = fs.readFileSync(path.join(EXAMPLES_DIR, file), 'utf8') } catch (_) {}
+          return {
+            file,
+            slug: m.slug || file.replace(/\.txt$/, ''),
+            stage: m.stage || '',
+            words: m.words || 0,
+            text,
+            dismissed: dismissed.has(file),
+          }
         })
         return json(res, 200, { items })
+      }
+
+      // dismiss / restore an example (it may already be clean, not slop)
+      if (route === '/api/examples/dismiss' && req.method === 'POST') {
+        const body = await readBody(req)
+        let file = '', dismissed = true
+        try { const j = JSON.parse(body); file = j.file || ''; dismissed = j.dismissed !== false } catch (_) {}
+        if (!/^[\w.\-]+\.txt$/.test(file)) return json(res, 400, { error: 'bad file name' })
+        const set = loadDismissed()
+        if (dismissed) set.add(file); else set.delete(file)
+        const tmp = DISMISSED_FILE + '.tmp'
+        fs.writeFileSync(tmp, JSON.stringify([...set], null, 2))
+        fs.renameSync(tmp, DISMISSED_FILE)
+        return json(res, 200, { ok: true, dismissedCount: set.size })
       }
 
       const docMatch = route.match(/^\/api\/doc\/(\w+)$/)

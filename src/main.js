@@ -155,6 +155,7 @@ const exScore = $('ex-score')
 const exLoad = $('ex-load')
 let exItems = []
 let exCurrent = null
+let exShowDismissed = false
 
 async function loadExamples() {
   try {
@@ -170,18 +171,55 @@ async function loadExamples() {
   exItems = exItems
     .map((it) => ({ ...it, sc: slopScore(it.text) }))
     .sort((a, b) => b.sc.score - a.sc.score)
-  exList.innerHTML = ''
-  for (const it of exItems) {
-    const el = document.createElement('div')
-    el.className = 'ex-item'
-    el.dataset.file = it.file
-    el.innerHTML =
-      `<span class="ex-dot" style="background:${it.sc.color}"></span>` +
-      `<span class="slug">${it.slug}</span>` +
-      `<span class="stage">${it.stage || ''}</span>`
-    el.addEventListener('click', () => showExample(it.file))
-    exList.appendChild(el)
+  renderExList()
+}
+
+function exRow(it, isDismissed) {
+  const act = isDismissed ? 'restore' : 'dismiss'
+  const glyph = isDismissed ? '↩' : '✕'
+  const title = isDismissed ? 'Restore' : 'Dismiss — already clean / not slop'
+  return `<div class="ex-item${isDismissed ? ' ex-dismissed' : ''}" data-file="${it.file}">` +
+    `<span class="ex-dot" style="background:${it.sc.color}"></span>` +
+    `<span class="slug">${it.slug}</span>` +
+    `<span class="stage">${it.stage || ''}</span>` +
+    `<button class="ex-act" data-act="${act}" data-file="${it.file}" title="${title}">${glyph}</button>` +
+    `</div>`
+}
+
+function renderExList() {
+  const active = exItems.filter((it) => !it.dismissed)
+  const dismissed = exItems.filter((it) => it.dismissed)
+  let html = `<div class="ex-head">${active.length} examples`
+  if (dismissed.length) {
+    html += ` · <button class="lnk" id="ex-toggle">${exShowDismissed ? 'hide' : 'show'} ${dismissed.length} dismissed</button>`
   }
+  html += '</div>'
+  html += active.map((it) => exRow(it, false)).join('')
+  if (exShowDismissed) html += dismissed.map((it) => exRow(it, true)).join('')
+  exList.innerHTML = html
+
+  exList.querySelectorAll('.ex-item').forEach((el) =>
+    el.addEventListener('click', () => showExample(el.dataset.file)))
+  exList.querySelectorAll('.ex-act').forEach((btn) =>
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      setDismissed(btn.dataset.file, btn.dataset.act === 'dismiss')
+    }))
+  const tg = document.getElementById('ex-toggle')
+  if (tg) tg.addEventListener('click', () => { exShowDismissed = !exShowDismissed; renderExList() })
+}
+
+async function setDismissed(file, dismissed) {
+  const it = exItems.find((x) => x.file === file)
+  if (it) it.dismissed = dismissed
+  renderExList()
+  try {
+    await fetch('/api/examples/dismiss', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file, dismissed }),
+    })
+  } catch (_) {}
 }
 
 function showExample(file) {
