@@ -77,6 +77,8 @@
       <span class="muted small">heavy rewrite in your voice, via your local CLI</span>
       <span class="spacer"></span>
       <span class="rw-voice muted small" id="rw-voice">voice: …</span>
+      <button class="lnk" id="rw-view">View</button>
+      <button class="lnk" id="rw-consolidate">Consolidate voice</button>
     </div>
 
     <main>
@@ -181,6 +183,19 @@
         <span class="toast" id="api-saved">Saved</span>
       </div>
       <textarea class="doc-text" id="api-text" spellcheck="false" placeholder="Loading API.md…"></textarea>
+    </div>
+  </div>
+
+  <!-- ===================== VOICE EXAMPLES MODAL ===================== -->
+  <div class="overlay" id="exm-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Your voice examples</h2>
+        <span class="spacer"></span>
+        <button class="lnk" id="exm-close">Close</button>
+      </div>
+      <div class="muted small" id="exm-sub" style="margin-bottom:14px"></div>
+      <div class="exm-list" id="exm-list"></div>
     </div>
   </div>
 
