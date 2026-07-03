@@ -161,6 +161,15 @@ voice to aim for is in [`voice.md`](voice.md). The app, [`API.md`](API.md) endpo
 
 ---
 
+## Django/DRF port
+
+[`django_api/`](django_api/) is a second backend for the same engine, ported to Python
+and served through Django REST Framework — same response shape, same rules, 14 tests,
+verified byte-identical output on the tested inputs (not a formal proof across all possible strings). See
+[`django_api/README.md`](django_api/README.md).
+
+---
+
 ## License
 
 MIT for the code. Example captions are sample content. Third-party essay text is **not**

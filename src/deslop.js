@@ -207,6 +207,8 @@ export function deslop(input) {
   text = text
     .replace(/[ \t]+([,.;:!?])/g, '$1')      // space before punctuation
     .replace(/,\s*,/g, ',')                   // ",," -> ","
+    .replace(/([.!?;:])\s*,+/g, '$1')         // ".," / ". ," -> "."  (orphan comma after a removed clause)
+    .replace(/,+\s*([.!?;:])/g, '$1')         // ",." / ", ." -> "."  (orphan comma before sentence end)
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/[ \t]{2,}/g, ' ')               // collapse runs of spaces
     .replace(/ +$/gm, '')                     // trailing spaces per line

@@ -3,6 +3,12 @@ dist
 .DS_Store
 *.log
 
+# Django/DRF port (django_api/) -- venv and bytecode, not the source
+django_api/venv
+django_api/**/__pycache__
+django_api/**/*.pyc
+django_api/db.sqlite3
+
 # third-party essays (copyright) — regenerate locally with examples/lyn-alden/fetch-lyn.sh
 examples/lyn-alden/*.txt
 
