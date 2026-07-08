@@ -1,5 +1,7 @@
 # No Slop
 
+[![CI](https://github.com/eatusc/no-slop/actions/workflows/ci.yml/badge.svg)](https://github.com/eatusc/no-slop/actions/workflows/ci.yml)
+
 Paste AI-generated text, get the human version. A minimalist tool that strips the
 tells of language-model writing — em-dash overload, curly quotes, emoji, filler
 openers, throat-clearing transitions, hype phrases, and inflated vocabulary — then
