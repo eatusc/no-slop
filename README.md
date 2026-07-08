@@ -92,7 +92,7 @@ pbpaste | deslop | pbcopy        # clean whatever's on your clipboard (macOS)
 deslop draft.md > draft.clean.md # clean a file
 ```
 
-(Offline variant, no server: `deslop() { node ~/Sites/localhost/noslop/cli/deslop.mjs "$@"; }`)
+(Offline variant, no server: `deslop() { node /path/to/no-slop/cli/deslop.mjs "$@"; }`)
 
 ### 2. Tell an LLM / coding agent to use it
 Paste this into Claude Code, Cursor, or any agent with shell or HTTP access:
@@ -139,7 +139,7 @@ def deslop(text: str) -> str:
 Make a "Clean selected text" service that pipes the selection through the CLI or curl:
 
 ```bash
-node ~/Sites/localhost/noslop/cli/deslop.mjs   # input: stdin, output: replaces selection
+node /path/to/no-slop/cli/deslop.mjs   # input: stdin, output: replaces selection
 ```
 
 ### 6. As an agent tool (MCP-style)
@@ -164,7 +164,7 @@ voice to aim for is in [`voice.md`](voice.md). The app, [`API.md`](API.md) endpo
 ## Django/DRF port
 
 [`django_api/`](django_api/) is a second backend for the same engine, ported to Python
-and served through Django REST Framework — same response shape, same rules, 14 tests,
+and served through Django REST Framework — same response shape, same rules, 18 tests,
 verified byte-identical output on the tested inputs (not a formal proof across all possible strings). See
 [`django_api/README.md`](django_api/README.md).
 

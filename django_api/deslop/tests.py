@@ -189,6 +189,36 @@ class EngineParityTests(APITestCase):
         self.assertEqual(len(f), 1)
         self.assertEqual(f[0]["type"], "antithesis")
 
+    def test_arrows_and_check_marks_survive_emoji_stripping(self):
+        # Regression: the emoji character class used to include the Arrows block
+        # (U+2190-21FF) and the check/cross marks (U+2713-2718), so "5% -> 10%"
+        # lost its arrow and "passed check" lost its tick. Those are meaningful
+        # in prose, not decorative emoji. Real emoji must still go.
+        self.assertEqual(deslop("revenue rose 5% → 10%")["text"], "Revenue rose 5% → 10%")
+        self.assertEqual(deslop("passed ✓ shipped 🚀")["text"], "Passed ✓ shipped")
+        self.assertNotIn("🚀", deslop("ship it 🚀")["text"])  # emoji still stripped
+
+    def test_lowercase_initial_brand_names_are_not_recapitalized(self):
+        # Regression: sentence-start re-capitalization used to uppercase the
+        # first letter of the next word blindly, turning "iPhone" into "IPhone".
+        # A brand whose second letter is a capital is intentional -- leave it.
+        self.assertEqual(deslop("It works. iPhone sales rose.")["text"],
+                         "It works. iPhone sales rose.")
+        self.assertEqual(deslop("iOS and eBay lead.")["text"], "iOS and eBay lead.")
+        # A genuinely lowercase sentence start is still capitalized.
+        self.assertEqual(deslop("done. the next step.")["text"], "Done. The next step.")
+
+    def test_lowercase_abbreviations_do_not_trigger_recapitalization(self):
+        # "e.g. the point" must not become "e.g. The point".
+        self.assertEqual(deslop("shipped it, e.g. the login flow")["text"],
+                         "Shipped it, e.g. the login flow")
+
+    def test_all_caps_word_swaps_stay_all_caps(self):
+        # Regression: match_case only checked the first character, so an all-caps
+        # inflated word ("LEVERAGE") swapped to a title-case plain word ("Use").
+        # It should stay all-caps ("USE").
+        self.assertEqual(deslop("LEVERAGE the synergy")["text"], "USE the teamwork")
+
     def test_rounding_matches_js_math_round_not_python_banker_rounding(self):
         # Caught in review: Python's builtin round() is banker's rounding
         # (round-half-to-even -- round(2.5) == 2), but JS's Math.round()

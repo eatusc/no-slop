@@ -138,4 +138,4 @@ Sources:
 - [How to Make AI Text Sound Human](https://aurawriteai.com/blog/how-to-make-ai-text-sound-human)
 - [How to Make AI Writing Sound Genuinely Human in 2026](https://medium.com/@vaibhav.agarwal.iitd/how-to-make-ai-writing-sound-genuinely-human-and-beat-top-ai-detectors-in-2026-2ff888b8d5c5)
 - [Humanize AI Text — Microsoft 365 Copilot](https://www.microsoft.com/en-us/microsoft-copilot/copilot-101/humanize-ai-text)
-- HAP `dont-read-this-bot` caption (`[redacted]/2-ready/instagram/dont-read-this-bot-carousel/caption.txt`)
+- HAP `dont-read-this-bot` caption (see `examples/dont-read-this-bot.txt`)

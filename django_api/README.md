@@ -1,8 +1,9 @@
 # No Slop — Django/DRF port
 
-A second backend for the same de-slop engine, built with the stack the
-[redacted] Senior Software Engineer posting asks for: **Python, Django,
-Django REST Framework**, with React/Next.js as the intended frontend.
+A second backend for the same de-slop engine, built on a **Python + Django +
+Django REST Framework** stack, with React/Next.js as the intended frontend. It
+shows the same engine and API contract running on a common enterprise Python
+stack, not just the Node original.
 
 The original app (`../`) is Node/Vite: one pure-function engine
 (`../src/deslop.js`) reused by an HTTP API embedded in Vite's dev server, a
@@ -16,7 +17,7 @@ django_api/
     serializers.py    # DRF input validation (the response shape is verified in tests.py instead)
     parsers.py         # custom parser so raw text/plain bodies work, like the Node API
     views.py            # POST/GET /api/deslop/
-    tests.py             # 14 tests: endpoint behavior, edge cases, engine parity
+    tests.py             # 18 tests: endpoint behavior, edge cases, engine parity
   cli/
     deslop_cli.py     # same engine, no server or Django needed
   noslop_api/
@@ -26,8 +27,8 @@ django_api/
 ## Why a second backend for the same tool
 
 The Node version is what actually runs day to day. This port exists to prove
-the same API design translates cleanly to Django/DRF — the exact backend
-stack in the [redacted] JD — without changing the response contract at all.
+the same API design translates cleanly to Django/DRF — a common enterprise
+backend stack — without changing the response contract at all.
 A client (curl, a script, a React app) can point at either backend and get
 the same output; see [Engine parity](#engine-parity) below for how that was
 checked on real inputs rather than assumed from reading the regex side by
@@ -46,7 +47,7 @@ cd django_api
 python3.14 -m venv venv && source venv/bin/activate   # or python3.12+
 pip install -r requirements.txt
 python manage.py migrate          # one-time; see "Migration noise" below
-python manage.py test deslop      # 14 tests, all green
+python manage.py test deslop      # 18 tests, all green
 python manage.py runserver 127.0.0.1:8420
 ```
 
@@ -96,8 +97,8 @@ an enforced guarantee.
 | Input validation | None (any string is valid) | `DeslopRequestSerializer`, 4MB cap enforced with a real 400 |
 | Abuse prevention | Rejects any request with a non-localhost `Origin` header | `AnonRateThrottle` (120/min) — Origin-header sniffing doesn't fit DRF's request cycle the same way |
 | Cross-origin frontend | N/A — same-origin, Vite serves the app itself | `django-cors-headers`, scoped to `localhost`/`127.0.0.1` only, for a separate React/Next.js dev server |
-| Tests | None in the Node version | 14 DRF `APITestCase` tests — endpoint shape, edge cases (empty text, oversized text, exact-boundary text, GET-path size cap), throttling (including one that actually drives past the limit and checks for a 429), and engine parity (including a JS-vs-Python rounding-semantics regression test) |
+| Tests | None in the Node version | 18 DRF `APITestCase` tests — endpoint shape, edge cases (empty text, oversized text, exact-boundary text, GET-path size cap), throttling (including one that actually drives past the limit and checks for a 429), and engine parity (including a JS-vs-Python rounding-semantics regression test) |
 
 That last row is deliberate: the Node app has no test suite, and porting it
-was the opportunity to add one, following the same "a feature isn't done
-until the tests are written" standard as the target job posting.
+was the opportunity to add one, following a "a feature isn't done until the
+tests are written" standard.

@@ -45,10 +45,14 @@ def _js_round(x):
 
 
 def _match_case(original, replacement):
-    """Re-capitalize a replacement to match the casing of what it replaced,
-    so swapping "Leverage" -> "Use" keeps the capital."""
+    """Re-capitalize a replacement to match the casing of what it replaced, so
+    swapping "Leverage" -> "Use" keeps the capital and "LEVERAGE" -> "USE"."""
     if not replacement:
         return replacement
+    # ALL CAPS -> ALL CAPS ("LEVERAGE" -> "USE")
+    if len(original) > 1 and original == original.upper() and original != original.lower():
+        return replacement.upper()
+    # Capitalized -> capitalize the first letter ("Leverage" -> "Use")
     if original[:1] and original[:1] == original[:1].upper() and original[:1] != original[:1].lower():
         return replacement[:1].upper() + replacement[1:]
     return replacement
@@ -140,9 +144,18 @@ TRANSITIONS = (
     r"Indeed|Essentially|Ultimately|Consequently|Subsequently),?\s+"
 )
 
+# Arrows (U+2190-21FF) and the check/cross marks (U+2713-2718: ✓✔✕✖✗✘) are
+# excluded -- they're meaningful in prose, not decorative emoji, so stripping
+# them corrupted text like "5% → 10%". Kept in parity with src/deslop.js.
 EMOJI_RE = (
-    "[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿︀-️‍]"
+    "[\U0001F000-\U0001FAFF"
+    "☀-✒✙-➿"
+    "⬀-⯿︀-️‍]"
 )
+
+# Common lowercase abbreviations after which the next word should NOT be
+# re-capitalized as a sentence start ("e.g. the point", not "e.g. The point").
+LOWER_ABBR = re.compile(r"\b(?:e\.g|i\.e|etc|vs|cf|viz|approx|esp)\.\s*$", re.IGNORECASE)
 
 
 def deslop(text):
@@ -221,11 +234,15 @@ def deslop(text):
     text = re.sub(r"\(\s*\)", "", text)
 
     # 9. Re-capitalize sentence starts (openers we removed may have exposed a
-    #    lowercase word as the new first word).
+    #    lowercase word as the new first word). Leave intentional lowercase-initial
+    #    brand names alone (iPhone, iOS, eBay -- the next letter is a capital) and
+    #    don't capitalize after common lowercase abbreviations (e.g., i.e., vs.).
     def recap(m):
+        if LOWER_ABBR.search(m.string[: m.start(2)]):
+            return m.group(0)
         return m.group(1) + m.group(2).upper()
 
-    text = re.sub(r"(^|[.!?]\s+|\n\s*)([a-z])", recap, text)
+    text = re.sub(r"(^|[.!?]\s+|\n\s*)([a-z])(?![a-zA-Z]*[A-Z])", recap, text)
 
     text = text.strip()
 

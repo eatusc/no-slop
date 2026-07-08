@@ -18,9 +18,15 @@ function countMatches(text, re) {
 }
 
 // Re-capitalize a replacement to match the casing of the text it replaced,
-// so swapping "Leverage" -> "Use" keeps the capital.
+// so swapping "Leverage" -> "Use" keeps the capital and "LEVERAGE" -> "USE".
 function matchCase(original, replacement) {
   if (!replacement) return replacement;
+  // ALL CAPS -> ALL CAPS ("LEVERAGE" -> "USE")
+  if (original.length > 1 && original === original.toUpperCase() &&
+      original !== original.toLowerCase()) {
+    return replacement.toUpperCase();
+  }
+  // Capitalized -> capitalize the first letter ("Leverage" -> "Use")
   if (original[0] && original[0] === original[0].toUpperCase() &&
       original[0] !== original[0].toLowerCase()) {
     return replacement[0].toUpperCase() + replacement.slice(1);
@@ -168,8 +174,10 @@ export function deslop(input) {
     .replace(/\s*[—–]\s*/g, ', ');                  // word — word -> word, word
   tally('Em / en dashes', dashes);
 
-  // 3. Emoji and variation selectors.
-  const emojiRe = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu;
+  // 3. Emoji and variation selectors. Arrows (U+2190–21FF) and the check/cross
+  //    marks (U+2713–2718: ✓✔✕✖✗✘) are excluded — they're meaningful in prose,
+  //    not decorative, so stripping them corrupted text like "5% → 10%".
+  const emojiRe = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{2712}\u{2719}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}]/gu;
   let emoji = countMatches(text, emojiRe);
   text = text.replace(emojiRe, '');
   tally('Emoji', emoji);
@@ -212,14 +220,18 @@ export function deslop(input) {
     .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
     .replace(/[ \t]{2,}/g, ' ')               // collapse runs of spaces
     .replace(/ +$/gm, '')                     // trailing spaces per line
-    .replace(/^[ \t]+/gm, (m) => m)           // keep indentation as-is
     .replace(/\n{3,}/g, '\n\n')               // max one blank line
     .replace(/^[,;:.\s]+/, '')                // leading orphan punctuation
     .replace(/\(\s*\)/g, '');                 // empty parens left behind
 
   // 9. Re-capitalize sentence starts (openers we removed may have exposed a
-  //    lowercase word as the new first word).
-  text = text.replace(/(^|[.!?]\s+|\n\s*)([a-z])/g, (_, pre, ch) => pre + ch.toUpperCase());
+  //    lowercase word as the new first word). Leave intentional lowercase-initial
+  //    brand names alone (iPhone, iOS, eBay — the next letter is a capital) and
+  //    don't capitalize after common lowercase abbreviations (e.g., i.e., vs.).
+  const LOWER_ABBR = /\b(?:e\.g|i\.e|etc|vs|cf|viz|approx|esp)\.\s*$/i;
+  text = text.replace(/(^|[.!?]\s+|\n\s*)([a-z])(?![a-zA-Z]*[A-Z])/g, (m, pre, ch, offset, str) =>
+    LOWER_ABBR.test(str.slice(0, offset + pre.length)) ? m : pre + ch.toUpperCase(),
+  );
 
   text = text.trim();
 
