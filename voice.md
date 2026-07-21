@@ -2,7 +2,7 @@
 
 The positive companion to `no-slop-rules.md`. That file says what to strip; this one
 says what to **emulate**. When de-slopping or writing from scratch, match this voice.
-Every example below is a real product caption from `examples/` — the ones that already
+Every example below is a real product caption from `examples/`, the ones that already
 read like a person was there.
 
 ---
@@ -167,7 +167,7 @@ disagree with, and respect for the reader's time. Short caption or long essay, s
 - Would I say this out loud to one person? If no, fix the rhythm.
 
 Sources & ethics:
-- **Short-form models:** the product captions in `examples/` — our own content, free to
+- **Short-form models:** the product captions in `examples/`, our own content, free to
   emulate: `dont-read-this-bot`, `build-it-yourself`, `ai-jobs-doom-boom`,
   `ai-interface-mcp`, `thrivepact-case-study`, `ai-codes-shortcuts`, `start-here`.
 - **Long-form calibration sample:** Lyn Alden's public essays were analyzed *only* to
