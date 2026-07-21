@@ -12,6 +12,8 @@ families, a command-line tool, and a native Model Context Protocol (MCP) server.
 A Django REST Framework port provides the same core response contract for a
 Python backend.
 
+![No Slop cleaning a sample of AI text: the Slopometer scores it 100/100 and the diff view shows 16 fixes](docs/media/hero.png)
+
 ## Why it is useful
 
 - **Deterministic cleanup:** remove em-dash overload, decorative emoji, filler
