@@ -164,10 +164,35 @@ pbpaste | node cli/deslop.mjs | pbcopy
 
 ## Local AI rewrite and voice learning
 
-The deterministic engine handles changes that are safe to automate. The local
-application can also invoke an installed Claude or Codex CLI for heavier rewrites.
-Those routes use the rules in [`no-slop-rules.md`](no-slop-rules.md), the voice
-guide in [`voice.md`](voice.md), and locally saved before/after examples.
+The deterministic engine handles changes that are safe to automate. For heavier
+rewrites, `POST /api/rewrite` orchestrates a locally installed Claude or Codex
+CLI. How the pipeline works:
+
+- **Your CLI login, no API keys.** The server spawns `claude -p` or
+  `codex exec` as subprocesses and rides whatever authentication those tools
+  already have. It never accepts, stores, or forwards a hosted API key. Codex
+  runs in a read-only sandbox with an ephemeral session; both engines get a
+  hard 180-second timeout with stdin closed.
+- **Few-shot retrieval without dependencies.** Every time you accept a rewrite
+  you like (or hand-edit one), the before/after pair is saved locally via
+  `POST /api/style`. On the next rewrite, the server tokenizes the input,
+  builds term-frequency vectors, and ranks all learned pairs by lexical cosine
+  similarity (with a stopword list, no embeddings, no libraries), then packs
+  the seed examples plus the top 8 most relevant learned pairs into the system
+  prompt. The style bank scales to hundreds of examples without bloating the
+  prompt.
+- **Consolidate voice.** Once you have at least 3 saved edits,
+  `POST /api/consolidate` sends the whole before/after corpus back through the
+  Claude CLI and asks it to distill 8-15 concrete imperative rules from your
+  actual editing patterns. The result is written into a marker-bounded section
+  of [`voice.md`](voice.md) (`<!-- LEARNED:START -->` to
+  `<!-- LEARNED:END -->`) with an atomic tmp-file rename, so repeated
+  consolidations replace only that section and the hand-written voice guide
+  around it is never touched.
+- **Prompt hygiene.** The system prompt sends a distilled "tells to avoid"
+  list instead of the full word-swap table (which pushes models toward literal
+  substitution instead of rewriting), and strips the quoted example sentences
+  from `voice.md` so the model cannot parrot them as openers.
 
 The associated route families are:
 
@@ -201,8 +226,11 @@ python manage.py test deslop
 python manage.py runserver 127.0.0.1:8420
 ```
 
-See [`django_api/README.md`](django_api/README.md) for implementation notes and
-the documented parity limitation between the JavaScript and Python engines.
+Parity between the JavaScript and Python engines is enforced in CI:
+[`scripts/parity-check.mjs`](scripts/parity-check.mjs) runs both engines over
+shared fixtures plus the full example corpus and fails on any output
+difference. See [`django_api/README.md`](django_api/README.md) for
+implementation notes.
 
 ## Development and validation
 
@@ -210,11 +238,12 @@ the documented parity limitation between the JavaScript and Python engines.
 npm run build       # production Vite build
 npm test            # Node engine regression tests
 npm run test:mcp    # real MCP stdio client/server smoke test
+npm run test:parity # diff Node and Python engine output on shared fixtures
 npm run check       # all Node checks
 ```
 
-CI runs the Node build, engine tests, MCP smoke test, and Django test suite on
-every push and pull request to `main`.
+CI runs the Node build, engine tests, MCP smoke test, cross-engine parity
+check, and Django test suite on every push and pull request to `main`.
 
 ## Security model
 
