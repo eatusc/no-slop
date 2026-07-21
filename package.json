@@ -1,13 +1,33 @@
 {
-  "name": "noslop",
+  "name": "no-slop",
   "private": true,
   "version": "0.1.0",
+  "description": "Local-first AI writing detector and cleanup engine with REST APIs, CLI, Django/DRF, and native MCP tools.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eatusc/no-slop.git"
+  },
+  "keywords": [
+    "ai-writing-detector",
+    "model-context-protocol",
+    "mcp-server",
+    "natural-language-processing",
+    "text-processing",
+    "writing-tools"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deslop": "node cli/deslop.mjs"
+    "deslop": "node cli/deslop.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:mcp": "node mcp/test-client.mjs",
+    "check": "npm run test && npm run build && npm run test:mcp"
   },
   "devDependencies": {
     "vite": "^7.0.0"

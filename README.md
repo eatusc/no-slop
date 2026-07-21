@@ -1,179 +1,232 @@
 # No Slop
 
 [![CI](https://github.com/eatusc/no-slop/actions/workflows/ci.yml/badge.svg)](https://github.com/eatusc/no-slop/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Paste AI-generated text, get the human version. A minimalist tool that strips the
-tells of language-model writing — em-dash overload, curly quotes, emoji, filler
-openers, throat-clearing transitions, hype phrases, and inflated vocabulary — then
-shows you exactly what changed and scores how sloppy the original was.
+Local-first AI writing cleanup for humans and agents. No Slop detects common
+LLM-writing patterns, rewrites safe mechanical issues, scores the input, and
+flags structural problems that need human judgment.
 
-Runs locally on a dedicated port: **http://localhost:4242**
+The same deterministic text engine powers a browser UI, seven local API route
+families, a command-line tool, and a native Model Context Protocol (MCP) server.
+A Django REST Framework port provides the same core response contract for a
+Python backend.
 
-One engine — [`src/deslop.js`](src/deslop.js) — powers the app, the HTTP API, and the
-CLI, so they all behave identically.
+## Why it is useful
 
----
+- **Deterministic cleanup:** remove em-dash overload, decorative emoji, filler
+  openers, throat-clearing transitions, hype phrases, and inflated vocabulary.
+- **AI-writing detection:** produce a 0-100 score with a signal breakdown.
+- **Human-in-the-loop review:** flag risky structural patterns instead of
+  pretending every rewrite can be safely automated.
+- **Agent integration:** expose `deslop` and `slop_score` as native MCP tools.
+- **Multiple interfaces, one engine:** browser, REST-style API, CLI, and MCP all
+  call [`src/deslop.js`](src/deslop.js).
+- **Local by default:** the server binds to `127.0.0.1`; the deterministic engine
+  does not require a hosted service or API key.
 
-## Features
+## Architecture
 
-- **De-slop** — paste on the left, clean version on the right, live. A word-level diff
-  highlights what was **swapped** (green) and **removed** (struck red).
-- **Slopometer** — a 0–100 gradient meter scoring how much slop the text carries,
-  weighting the *"it's not X, it's Y"* antithesis pattern hardest (the #1 AI tell).
-- **Flags** — structural tells that can't be safely auto-rewritten (the antithesis
-  family) are flagged for you to fix by hand.
-- **Examples** — browse a caption corpus, sorted by slop score.
-- **Rules / Voice / API** — [`no-slop-rules.md`](no-slop-rules.md) (what to strip),
-  [`voice.md`](voice.md) (what to emulate), and [`API.md`](API.md), all viewable and
-  editable in-app, saved straight to disk.
+| Surface | Technology | Purpose |
+|---|---|---|
+| Web application | Vite + vanilla JavaScript | Live cleanup, diff, scoring, examples, and voice rules |
+| Local API | Node/Vite middleware | Text cleanup, AI rewrite orchestration, style learning, examples, and editable docs |
+| MCP server | Model Context Protocol over stdio | Native tools for Claude Code, Claude Desktop, Cursor, and other MCP clients |
+| CLI | Node.js | Shell pipelines, files, clipboard workflows, and automation |
+| Python API | Django + Django REST Framework | Alternative backend with validation, throttling, CORS controls, and 18 tests |
+| Core engine | Dependency-free JavaScript | Shared cleanup, scoring, and structural flag detection |
 
----
+```text
+Browser UI ─┐
+Local API ──┼──> src/deslop.js <── CLI
+MCP server ─┘          │
+                      └── deterministic cleanup + score + flags
 
-## Run it
+Django/DRF API ──> Python port with the same response contract
+```
+
+## Quick start
+
+Requires Node.js 20 or newer.
 
 ```bash
+git clone https://github.com/eatusc/no-slop.git
+cd no-slop
 npm install
-npm run dev          # http://localhost:4242
+npm run dev
 ```
 
-The de-slop API is live whenever the app is running.
+Open [http://localhost:4242](http://localhost:4242).
 
----
+## HTTP API
 
-## Use the API
-
-`POST /api/deslop` with raw text, or JSON `{"text": "..."}`.
+The main integration endpoint accepts raw text or JSON:
 
 ```bash
-# full JSON report: clean text + slop score + fixes + flags
 curl -s -X POST http://localhost:4242/api/deslop \
-  -H "Content-Type: text/plain" --data-binary 'your AI text here'
-
-# just the clean text (text/plain) — ideal for piping
-curl -s -X POST "http://localhost:4242/api/deslop?clean=1" --data-binary @notes.md
+  -H "Content-Type: application/json" \
+  -d '{"text":"Furthermore, our seamless platform leverages cutting-edge AI. 🚀"}'
 ```
 
-Response shape:
+Example response:
 
-```jsonc
+```json
 {
-  "clean": "the de-slopped text",
-  "slop":  { "score": 100, "label": "Pure slop", "signals": { "flips": 1, ... } },
-  "fixes": { "total": 14, "byCategory": [ { "label": "Inflated words", "count": 9 } ] },
-  "flags": [ { "type": "antithesis", "label": "\"it's not X, it's Y\" pattern",
-              "fix": "Cut the negation. Make the one positive point directly.",
-              "count": 1, "samples": ["It is not just a tool, it is"] } ],
-  "words": { "in": 23, "out": 18 }
+  "clean": "Our smooth platform uses advanced AI.",
+  "slop": {
+    "score": 100,
+    "label": "Pure slop",
+    "signals": {
+      "transitions": 1,
+      "emoji": 1,
+      "words": 3
+    }
+  },
+  "fixes": {
+    "total": 5,
+    "byCategory": [
+      { "label": "Emoji", "count": 1 },
+      { "label": "Throat-clearing transitions", "count": 1 },
+      { "label": "Inflated words", "count": 3 }
+    ]
+  },
+  "flags": [],
+  "words": {
+    "in": 8,
+    "out": 6
+  }
 }
 ```
 
-`clean` is auto-fixed. `flags` are things to rewrite by hand. Full reference: [`API.md`](API.md).
-
-No server? Use the CLI: `echo "text" | node cli/deslop.mjs --report`.
-
----
-
-## Plug it into your workflow
-
-### 1. A shell command you can run from anywhere
-Add to `~/.zshrc` (adjust the path), then `source ~/.zshrc`:
+Return only clean text for shell pipelines:
 
 ```bash
-deslop() {
-  # reads stdin or a file arg, prints the clean text
-  if [ -t 0 ] && [ -n "$1" ]; then
-    curl -s -X POST "http://localhost:4242/api/deslop?clean=1" --data-binary @"$1"
-  else
-    curl -s -X POST "http://localhost:4242/api/deslop?clean=1" --data-binary @-
-  fi
+curl -s -X POST "http://localhost:4242/api/deslop?clean=1" \
+  --data-binary @draft.md > draft.clean.md
+```
+
+The application also has local routes for AI-assisted rewrites, learned style
+examples, rule consolidation, the example corpus, and editable documentation.
+See the complete route and security reference in [`API.md`](API.md).
+
+## Native MCP server
+
+No HTTP server is required for MCP. The stdio server imports the core engine
+directly and exposes two tools:
+
+| Tool | Input | Result |
+|---|---|---|
+| `deslop` | `{ "text": "..." }` | Clean text, score, fixes, flags, and a JSON report |
+| `slop_score` | `{ "text": "..." }` | Score and label without rewriting |
+
+Register it with Claude Code:
+
+```bash
+claude mcp add -s user noslop -- node /ABSOLUTE/PATH/no-slop/mcp/server.mjs
+```
+
+Claude Desktop or Cursor configuration:
+
+```json
+{
+  "mcpServers": {
+    "noslop": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/no-slop/mcp/server.mjs"]
+    }
+  }
 }
 ```
 
-```bash
-pbpaste | deslop | pbcopy        # clean whatever's on your clipboard (macOS)
-deslop draft.md > draft.clean.md # clean a file
-```
-
-(Offline variant, no server: `deslop() { node /path/to/no-slop/cli/deslop.mjs "$@"; }`)
-
-### 2. Tell an LLM / coding agent to use it
-Paste this into Claude Code, Cursor, or any agent with shell or HTTP access:
-
-> **De-slop rule.** Before you hand me any final writing, run it through my local No Slop
-> engine instead of editing by feel. POST the text to
-> `http://localhost:4242/api/deslop` (raw body), return the `clean` field, then for each
-> item in `flags` rewrite that sentence per its `fix`. Show me the final text and the
-> `slop.score`.
-
-Or point the model at the rules files directly (the "anti-style-file" method): give it
-[`no-slop-rules.md`](no-slop-rules.md) and [`voice.md`](voice.md) and say *"apply these
-as rules to everything you write for me."*
-
-### 3. From Node / a script
-
-```js
-const res = await fetch('http://localhost:4242/api/deslop', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ text }),
-})
-const { clean, slop, flags } = await res.json()
-```
-
-Or import the engine directly, no server:
-
-```js
-import { deslop, slopScore, flagsFor } from './src/deslop.js'
-const { text: clean } = deslop(input)
-```
-
-### 4. From Python
-
-```python
-import requests
-def deslop(text: str) -> str:
-    r = requests.post("http://localhost:4242/api/deslop",
-                      data=text.encode(), headers={"Content-Type": "text/plain"})
-    return r.json()["clean"]
-```
-
-### 5. macOS Quick Action / Raycast / Alfred
-Make a "Clean selected text" service that pipes the selection through the CLI or curl:
+Test the full MCP client/server exchange:
 
 ```bash
-node /path/to/no-slop/cli/deslop.mjs   # input: stdin, output: replaces selection
+npm run test:mcp
 ```
 
-### 6. As an agent tool (MCP-style)
-Describe one tool to your agent:
+See [`mcp/README.md`](mcp/README.md) for details.
 
-- **name:** `deslop`
-- **description:** "Remove AI-writing tells from text. Returns cleaned text plus flags to rewrite by hand."
-- **call:** `POST http://localhost:4242/api/deslop` with `{ "text": "..." }`
-- **use the result's** `clean` field; surface `flags` to the user.
+## CLI
 
----
+The CLI works without a server:
 
-## How it works
+```bash
+echo "We leverage a robust solution." | npm run deslop -- --report
+node cli/deslop.mjs draft.md > draft.clean.md
+node cli/deslop.mjs --json < draft.md
+```
 
-The engine encodes the rules in [`no-slop-rules.md`](no-slop-rules.md); the positive
-voice to aim for is in [`voice.md`](voice.md). The app, [`API.md`](API.md) endpoint, and
-[`cli/deslop.mjs`](cli/deslop.mjs) all call the same `deslop()`, `slopScore()`, and
-`flagsFor()` — change a rule once, everything updates.
+Example macOS clipboard workflow:
 
----
+```bash
+pbpaste | node cli/deslop.mjs | pbcopy
+```
 
-## Django/DRF port
+## Local AI rewrite and voice learning
 
-[`django_api/`](django_api/) is a second backend for the same engine, ported to Python
-and served through Django REST Framework — same response shape, same rules, 18 tests,
-verified byte-identical output on the tested inputs (not a formal proof across all possible strings). See
-[`django_api/README.md`](django_api/README.md).
+The deterministic engine handles changes that are safe to automate. The local
+application can also invoke an installed Claude or Codex CLI for heavier rewrites.
+Those routes use the rules in [`no-slop-rules.md`](no-slop-rules.md), the voice
+guide in [`voice.md`](voice.md), and locally saved before/after examples.
 
----
+The associated route families are:
+
+- `POST /api/rewrite`
+- `GET`, `POST`, and `DELETE /api/style`
+- `POST /api/consolidate`
+- `GET /api/examples` and `POST /api/examples/dismiss`
+- `GET` and `POST /api/doc/{rules|voice|api}`
+
+Personal learned examples are gitignored. AI rewrite routes require a locally
+installed and authenticated CLI; the deterministic engine, API, CLI, and MCP
+tools do not.
+
+## Django REST Framework implementation
+
+[`django_api/`](django_api/) ports the engine and API contract to Python,
+Django, and Django REST Framework. It includes:
+
+- JSON and `text/plain` request parsing
+- request validation and a 4 MB limit
+- local-development CORS controls
+- anonymous rate limiting
+- 18 endpoint, regression, throttling, and parity tests
+
+```bash
+cd django_api
+python3.12 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py test deslop
+python manage.py runserver 127.0.0.1:8420
+```
+
+See [`django_api/README.md`](django_api/README.md) for implementation notes and
+the documented parity limitation between the JavaScript and Python engines.
+
+## Development and validation
+
+```bash
+npm run build       # production Vite build
+npm test            # Node engine regression tests
+npm run test:mcp    # real MCP stdio client/server smoke test
+npm run check       # all Node checks
+```
+
+CI runs the Node build, engine tests, MCP smoke test, and Django test suite on
+every push and pull request to `main`.
+
+## Security model
+
+The local server can invoke installed AI CLIs and update local style/doc files,
+so it intentionally binds only to loopback. API requests with a non-localhost
+browser `Origin` are rejected. Do not reverse-proxy or expose port 4242 to a
+network without adding authentication and authorization.
+
+See [`SECURITY.md`](SECURITY.md) for reporting and deployment guidance.
 
 ## License
 
-MIT for the code. Example captions are sample content. Third-party essay text is **not**
-included; the long-form writing rules in `voice.md` are general craft in our own words,
-and any analysis source can be regenerated locally with `examples/lyn-alden/fetch-lyn.sh`.
+Code is available under the [MIT License](LICENSE). Example captions are sample
+content. Third-party essay text is not included; the long-form writing rules are
+general writing guidance.
