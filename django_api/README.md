@@ -74,20 +74,22 @@ fix categories, slop score, and signal breakdown all matched exactly. The
 diff script isn't checked in (it's a one-off), and the fixture strings and
 their expected values are pinned in `deslop/tests.py`'s `EngineParityTests`.
 
-**Known limitation, stated plainly:** that pin only guards the Python side.
-`EngineParityTests` asserts `deslop/engine.py`'s output against hardcoded
-expected values — it does not run `../src/deslop.js` and compare live, because
-the Django test environment has no Node runtime wired in. So it *will* fail
-loudly if `engine.py` changes and produces a different result for the pinned
-fixture (that's real regression protection for the Python side). It will
-**not** fail if someone edits `../src/deslop.js`'s regex rules without
-touching `engine.py` at all — the two engines can drift apart silently in
-that direction, and nothing in this test suite would catch it. Closing that
-gap for real would mean either running the Node engine from Python (e.g. via
-a subprocess call to `node`) inside the test, or a separate CI job that runs
-both and diffs; neither exists here. Re-running the parity check manually
-before releasing either engine's regex changes is, for now, a discipline, not
-an enforced guarantee.
+**Scope of the pin:** `EngineParityTests` asserts `deslop/engine.py`'s output
+against hardcoded expected values. It fails loudly if `engine.py` changes and
+produces a different result for a pinned fixture, but it does not run
+`../src/deslop.js` inside the Django test environment, so on its own it could
+not catch drift introduced from the JavaScript side.
+
+**That gap is now closed in CI.** `../scripts/parity-check.mjs` runs both
+engines live over the same inputs (the pinned fixture families above plus
+every committed caption in `../examples/`) and diffs the normalized output
+field by field: cleaned text, fix totals and categories, slop score, label,
+signal breakdown, per-100 density, word counts, and structural flags. Any
+mismatch fails the run. It executes as the `engine-parity` job in
+`../.github/workflows/ci.yml` on every push and pull request, and locally via
+`npm run test:parity` from the repo root. Editing either engine's rules
+without porting the change to the other now breaks CI instead of drifting
+silently.
 
 ## What's different from the Node version, and why
 

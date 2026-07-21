@@ -27,6 +27,7 @@
     "deslop": "node cli/deslop.mjs",
     "test": "node --test test/*.test.mjs",
     "test:mcp": "node mcp/test-client.mjs",
+    "test:parity": "node scripts/parity-check.mjs",
     "check": "npm run test && npm run build && npm run test:mcp"
   },
   "devDependencies": {

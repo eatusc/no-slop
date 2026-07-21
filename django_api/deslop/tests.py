@@ -168,13 +168,13 @@ class EngineParityTests(APITestCase):
     inputs, once, manually, before this port was wired into Django -- see the
     project README's "Engine parity" section.
 
-    Honest limitation: this only guards the Python side. It fails loudly if
-    engine.py's output for this fixture changes -- that's real regression
-    protection. It does NOT run the Node engine and compare live (no Node
-    runtime in this test environment), so if src/deslop.js's regex rules
-    change without a matching change here, the two engines can drift apart
-    silently and nothing in this suite will catch it. There is no automated
-    "Node twin" of this test today.
+    Scope: this suite only guards the Python side. It fails loudly if
+    engine.py's output for a pinned fixture changes -- that's real regression
+    protection -- but it does not run the Node engine here (no Node runtime
+    in this test environment). Live cross-engine comparison happens in
+    ../../scripts/parity-check.mjs, which runs BOTH engines over shared
+    fixtures plus the example corpus and diffs the output; it runs as the
+    engine-parity job in CI and locally via `npm run test:parity`.
     """
 
     def test_known_sample_matches_recorded_node_output(self):
