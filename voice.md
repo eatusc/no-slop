@@ -2,7 +2,7 @@
 
 The positive companion to `no-slop-rules.md`. That file says what to strip; this one
 says what to **emulate**. When de-slopping or writing from scratch, match this voice.
-Every example below is a real HAP caption from `examples/` — the ones that already
+Every example below is a real product caption from `examples/` — the ones that already
 read like a person was there.
 
 ---
@@ -87,7 +87,7 @@ adjectives. An opinion you can disagree with. Confident enough to undersell.
 
 ## Long-form rules — clear analytical writing
 
-HAP captions are short and punchy. For **longer explanatory/analytical writing**, use
+The example captions are short and punchy. For **longer explanatory/analytical writing**, use
 the general craft rules below.
 
 > **White-hat note.** These are *general, well-established writing principles* — vary
@@ -153,7 +153,7 @@ Plain hook → why you should care → define the terms → build the mechanism 
 (question → explanation → short landing, repeated) → concrete numbered examples →
 honest caveats and the other side → flat, specific close. No "In conclusion."
 
-The throughline with HAP: real specifics over adjectives, an honest opinion you can
+The throughline: real specifics over adjectives, an honest opinion you can
 disagree with, and respect for the reader's time. Short caption or long essay, same idea
 — **your** voice, just clearer.
 
@@ -167,7 +167,7 @@ disagree with, and respect for the reader's time. Short caption or long essay, s
 - Would I say this out loud to one person? If no, fix the rhythm.
 
 Sources & ethics:
-- **Short-form models:** HAP's own captions in `examples/` — our own content, free to
+- **Short-form models:** the product captions in `examples/` — our own content, free to
   emulate: `dont-read-this-bot`, `build-it-yourself`, `ai-jobs-doom-boom`,
   `ai-interface-mcp`, `thrivepact-case-study`, `ai-codes-shortcuts`, `start-here`.
 - **Long-form calibration sample:** Lyn Alden's public essays were analyzed *only* to

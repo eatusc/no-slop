@@ -350,7 +350,7 @@ ${corpus}`
       }
 
       if (route === '/api/examples' && req.method === 'GET') {
-        // _index.json provides metadata for the shipped HAP captions; any other
+        // _index.json provides metadata for the shipped example captions; any other
         // .txt dropped in examples/ (e.g. your own local-only drafts) is picked
         // up by scanning the folder and enriched with derived metadata.
         const meta = {}

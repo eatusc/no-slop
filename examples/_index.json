@@ -190,11 +190,5 @@
     "slug": "ubi-check-or-share",
     "stage": "_production",
     "words": 136
-  },
-  {
-    "file": "zz-prod-1781633916.txt",
-    "slug": "zz-prod-1781633916",
-    "stage": "_archive",
-    "words": 7
   }
 ]
